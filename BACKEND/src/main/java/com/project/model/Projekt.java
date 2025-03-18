@@ -1,10 +1,11 @@
-package com.projepackage com.project.model;
+package com.project.model;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -34,10 +35,16 @@ public class Projekt {
     @Field(name = "dataczas_modyfikacji")
     private LocalDateTime lastModifiedDate;
 
-    @JsonIgnoreProperties({"projekt"})
-    private List<Zadanie> zadania;
+    // Relacje - opcja 1 (przechowujemy tylko ID jako String, zalecane)
+    private List<String> zadaniaIds; // ID zadań w MongoDB
+    private Set<String> studenciIds; // ID studentów w MongoDB
 
-    private Set<Student> studenci;
+    // Relacje - opcja 2 (pełne obiekty, jeśli konieczne)
+    // @DBRef
+    // private List<Zadanie> zadania;
+
+    // @DBRef
+    // private Set<Student> studenci;
 
     // ✅ Pusty konstruktor (wymagany przez Spring Data)
     public Projekt() {}
@@ -60,10 +67,14 @@ public class Projekt {
     public LocalDateTime getLastModifiedDate() { return lastModifiedDate; }
     public void setLastModifiedDate(LocalDateTime lastModifiedDate) { this.lastModifiedDate = lastModifiedDate; }
 
-    public List<Zadanie> getZadania() { return zadania; }
-    public void setZadania(List<Zadanie> zadania) { this.zadania = zadania; }
+    public List<String> getZadaniaIds() { return zadaniaIds; }
+    public void setZadaniaIds(List<String> zadaniaIds) { this.zadaniaIds = zadaniaIds; }
 
-    public Set<Student> getStudenci() { return studenci; }
-    public void setStudenci(Set<Student> studenci) { this.studenci = studenci; }
+    public Set<String> getStudenciIds() { return studenciIds; }
+    public void setStudenciIds(Set<String> studenciIds) { this.studenciIds = studenciIds; }
+
+    // Dodanie metody getProjektId(), odpowiadającej metodzie getId()
+    public String getProjektId() {
+        return this.id;
+    }
 }
-
