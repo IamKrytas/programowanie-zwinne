@@ -1,5 +1,7 @@
 import { Container, Row, Col, Button } from 'react-bootstrap';
-import 'bootstrap/dist/css/bootstrap.min.css';
+
+// caused import error when calling "npm run build", to be fixed later
+// import 'bootstrap/dist/css/bootstrap.min.css';
 
 const HomeView = () => {
 return (
