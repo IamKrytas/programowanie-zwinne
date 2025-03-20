@@ -1,0 +1,52 @@
+# ======================================================================
+# This is a docker-compose file that allows to 
+# run whole application (including dependencies) for production purposes.
+#
+# To run: (while being in the repo root directory)
+# docker-compose -f CONTRIB/docker/app-release.yaml up -d
+#
+# To stop: (while being in the repo root directory)
+# docker-compose -f CONTRIB/docker/app-release.yaml down
+# 
+# After running the file, you should be able to access:
+# - frontend app at http://localhost:8090
+# - backend app at http://localhost:8095
+# ======================================================================
+
+version: '3.8'
+
+services:
+  ptracker-release-mongodb:
+    image: mongo:latest
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: admin
+    volumes:
+      - mongo-release-data:/data/db
+
+  ptracker-release-frontend:
+    build:
+      context: ../../FRONTEND
+      dockerfile: ../CONTRIB/docker/frontend.Dockerfile
+    ports:
+      - "8090:80"
+    environment:
+      - NODE_ENV=production
+  
+  ptracker-release-backend:
+    build:
+      context: ../../BACKEND
+      dockerfile: ../CONTRIB/docker/backend.Dockerfile
+    ports:
+      - "8095:8095"
+    environment:
+      - PTRACKER_BACKEND_PORT=8095
+      - PTRACKER_BACKEND_MONGO_HOST=ptracker-release-mongodb
+      - PTRACKER_BACKEND_MONGO_PORT=27017
+      - PTRACKER_BACKEND_MONGO_USERNAME=admin
+      - PTRACKER_BACKEND_MONGO_PASSWORD=admin
+
+
+volumes:
+  mongo-release-data:
+    driver: local
