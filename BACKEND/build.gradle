@@ -28,6 +28,9 @@ dependencies {
     implementation 'org.springdoc:springdoc-openapi-webmvc-core:1.6.6'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+	compileOnly 'org.projectlombok:lombok:1.18.20'
+	annotationProcessor 'org.projectlombok:lombok:1.18.20'
 }
 
 tasks.named('test') {
