@@ -1,12 +1,29 @@
 package com.project.model;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
+
+import java.time.LocalDateTime;
+import java.util.Set;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 @Document(collection = "task")
 public class Task {
 
     @Id
     private int id;
 
-    private Set<int> fileId;
+    @NotBlank()
+    @Field(name = "fileId")
+    private Set<Integer> fileId;
 
     @NotBlank()
     @Field(name = "studentId")
@@ -22,9 +39,9 @@ public class Task {
     private String name;
 
     @NotBlank()
-    @Size(min = 10, max = 200, message = "Discription should have at least {min} and maximum of {max} characters.")
-    @Field(name = "discription")
-    private String discription;
+    @Size(min = 10, max = 200, message = "Description should have at least {min} and maximum of {max} characters.")
+    @Field(name = "description")
+    private String description;
 
     @NotBlank()
     @Field(name = "priority")
@@ -37,79 +54,5 @@ public class Task {
     @NotBlank()
     @Field(name = "creationDate")
     private LocalDateTime creationDate;
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public Set<int> getFileId() {
-        return fileId;
-    }
-
-    public void setFileId(Set<int> fileId) {
-        this.fileId = fileId;
-    }
-
-    public int getStudentId() {
-        return studentId;
-    }
-
-    public void setStudentId(int studentId) {
-        this.studentId = studentId;
-    }
-
-    public int getProjectId() {
-        return projectId;
-    }
-
-    public void setProjectId(int projectId) {
-        this.projectId = projectId;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDiscription() {
-        return discription;
-    }
-
-    public void setDiscription(String discription) {
-        this.discription = discription;
-    }
-
-    public int getPriority() {
-        return priority;
-    }
-
-    public void setPriority(int priority) {
-        this.priority = priority;
-    }
-
-    public LocalDateTime getDoneDate() {
-        return doneDate;
-    }
-
-    public void setDoneDate(LocalDateTime doneDate) {
-        this.doneDate = doneDate;
-    }
-
-    public LocalDateTime getCreationDate() {
-        return creationDate;
-    }
-
-    public void setCreationDate(LocalDateTime creationDate) {
-        this.creationDate = creationDate;
-    }
-
-
 
 }
