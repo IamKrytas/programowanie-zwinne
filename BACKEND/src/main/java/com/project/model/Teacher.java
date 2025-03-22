@@ -9,11 +9,12 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Document(collection = "student")
-public class Student {
+@Document(collection = "teacher")
+public class Teacher {
 
     @Id
     private int id;
@@ -32,10 +33,6 @@ public class Student {
     @Size(min = 2, max = 50, message = "E-mail should have at least {min} and maximum of {max} characters.")
     @Field(name = "email")
     private String email;
-
-    @NotBlank()
-    @Field(name = "stationary")
-    private boolean stationary;
 
     @NotBlank()
     @Size(min = 18, max = 50, message = "Password should have at least {min}.")
