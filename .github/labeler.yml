@@ -1,0 +1,16 @@
+backend:
+- changed-files:
+  - any-glob-to-any-file: 'BACKEND/**'
+
+frontend:
+- changed-files:
+  - any-glob-to-any-file: 'FRONTEND/**'
+
+infra:
+- changed-files:
+  - any-glob-to-any-file:
+    - '.github/**'
+    - 'CONTRIB/**'
+
+hotfix:
+ - head-branch: ['fix', 'hotfix', 'bug', 'bug-fix']
