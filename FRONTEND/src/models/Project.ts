@@ -7,6 +7,6 @@ export interface Project {
     students: number[];
     name: string;
     description: string;
-    doneDate: string;
-    creationDate: string;
+    doneDate: Date;
+    creationDate: Date;
 }
