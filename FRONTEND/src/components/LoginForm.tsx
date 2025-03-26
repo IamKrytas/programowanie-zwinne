@@ -1,11 +1,34 @@
 // imports
 import { useState } from 'react';
 import { Button, Card, Col, Container, Form, Row } from 'react-bootstrap';
+import { LoginFormData } from '../models/User';
+import { loginUser } from '../controllers/userController';
 
 const LoginForm = () => {
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    ``
+
+    const [formData, setFormData] = useState<LoginFormData>({
+        email: '',
+        password: '',
+    });
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        console.log(formData);
+
+        try {
+            const message = await loginUser(formData);
+            console.log(message);
+        }
+        catch (error) {
+            console.error(error);
+        }
+    };
+
+
     return (
         <Container className="vh-100 justify-content-center align-items-center mt-3">
             <Row className="justify-content-center h-100">
@@ -14,15 +37,15 @@ const LoginForm = () => {
                         <Card.Body className="p-4">
                             <h3 className="text-center mb-4 text-primary">Logowanie</h3>
                             <h6 className="text-center mb-4 text-muted">Wprowadź swoje dane, aby przejść do aplikacji</h6>
-                            <Form>
+                            <Form onSubmit={handleSubmit}>
                                 <Form.Group className="mb-3" controlId="formEmail">
                                     <Form.Label>Email</Form.Label>
                                     <Form.Control
                                         type="email"
-                                        placeholder="Wpisz adres e-mail"
                                         name="email"
-                                        value={email}
-                                        onChange={(e) => setEmail(e.target.value)}
+                                        placeholder="Wpisz adres e-mail"
+                                        value={formData.email}
+                                        onChange={handleChange}
                                         required
                                     />
                                 </Form.Group>
@@ -31,10 +54,10 @@ const LoginForm = () => {
                                     <Form.Label>Hasło</Form.Label>
                                     <Form.Control
                                         type="password"
-                                        placeholder="Wprowadź hasło"
                                         name="password"
-                                        value={password}
-                                        onChange={(e) => setPassword(e.target.value)}
+                                        placeholder="Wprowadź hasło"
+                                        value={formData.password}
+                                        onChange={handleChange}
                                         required
                                     />
                                 </Form.Group>
@@ -43,7 +66,7 @@ const LoginForm = () => {
                                     variant="primary"
                                     type="button"
                                     className="w-100 mb-2"
-                                    onClick={() => console.log('Zaloguj')}
+                                    onClick={handleSubmit}
                                 >
                                     Zaloguj się
                                 </Button>
