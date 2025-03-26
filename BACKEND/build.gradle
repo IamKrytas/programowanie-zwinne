@@ -24,13 +24,22 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'com.fasterxml.jackson.core:jackson-databind'
-    implementation 'io.springfox:springfox-boot-starter:3.0.0'
-    implementation 'org.springdoc:springdoc-openapi-webmvc-core:1.6.6'
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.5'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
 	compileOnly 'org.projectlombok:lombok:1.18.30'
 	annotationProcessor 'org.projectlombok:lombok:1.18.30'
+}
+
+configurations.all {
+    resolutionStrategy {
+        force 'jakarta.validation:jakarta.validation-api:3.1.0'
+        force 'jakarta.xml.bind:jakarta.xml.bind-api:4.0.0'
+        force 'org.springframework:spring-webmvc:6.2.3'
+        force 'org.jboss.logging:jboss-logging:3.6.1.Final'
+        force 'com.fasterxml:classmate:1.7.0'
+    }
 }
 
 tasks.named('test') {
