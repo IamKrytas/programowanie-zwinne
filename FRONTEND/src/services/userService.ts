@@ -15,5 +15,13 @@ export const registerUserService = async (userData: RegisterFormData): Promise<s
 
 // Login existing user
 export const loginUserService = async (userData: LoginFormData): Promise<string> => {
-// ...
+  const API_URL = "http://localhost:5000";
+  const response = await fetch(`${API_URL}/login`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(userData),
+  });
+  return await response.json();
 }
