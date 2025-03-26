@@ -1,12 +1,34 @@
 // imports
 import { useState } from 'react';
 import { Button, Card, Col, Container, Form, Row } from 'react-bootstrap';
+import { RegisterFormData } from '../models/User';
+import { registerUser } from '../controllers/userController';
 
 const RegisterForm = () => {
-    const [username, setUsername] = useState('');
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [confirmPassword, setConfirmPassword] = useState('');
+
+    const [formData, setFormData] = useState<RegisterFormData>({
+        username: '',
+        email: '',
+        password: '',
+        confirmPassword: '',
+    });
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setFormData({ ...formData, [e.target.name]: e.target.value });
+      };
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        console.log(formData);
+
+        try {
+            const message = await registerUser(formData);
+            console.log(message);
+        }
+        catch (error) {
+            console.error(error);
+        }
+    };
 
 
     return (
@@ -17,14 +39,15 @@ const RegisterForm = () => {
                         <Card.Body className="p-4">
                             <h3 className="text-center mb-3 text-primary">Rejestracja</h3>
                             <h6 className="text-center mb-3 text-muted"> Utwórz konto, aby korzystać z aplikacji</h6>
-                            <Form>
+                            <Form onSubmit={handleSubmit}>
                                 <Form.Group className="mb-3" controlId="formName">
                                     <Form.Label>Nazwa użytkownika</Form.Label>
                                     <Form.Control
                                         type="text"
+                                        name='username'
                                         placeholder="Wprowadź nazwę"
-                                        value={username}
-                                        onChange={(e) => setUsername(e.target.value)}
+                                        value={formData.username}
+                                        onChange={handleChange}
                                         required
                                     />
                                 </Form.Group>
@@ -33,9 +56,10 @@ const RegisterForm = () => {
                                     <Form.Label>Email</Form.Label>
                                     <Form.Control
                                         type="email"
+                                        name='email'
                                         placeholder="Wprowadź email"
-                                        value={email}
-                                        onChange={(e) => setEmail(e.target.value)}
+                                        value={formData.email}
+                                        onChange={handleChange}
                                         required
                                     />
                                 </Form.Group>
@@ -44,9 +68,10 @@ const RegisterForm = () => {
                                     <Form.Label>Hasło</Form.Label>
                                     <Form.Control
                                         type="password"
+                                        name='password'
                                         placeholder="Wprowadź hasło"
-                                        value={password}
-                                        onChange={(e) => setPassword(e.target.value)}
+                                        value={formData.password}
+                                        onChange={handleChange}
                                         required
                                     />
                                 </Form.Group>
@@ -55,9 +80,10 @@ const RegisterForm = () => {
                                     <Form.Label>Powtórz hasło</Form.Label>
                                     <Form.Control
                                         type="password"
+                                        name='confirmPassword'
                                         placeholder="Powtórz hasło"
-                                        value={confirmPassword}
-                                        onChange={(e) => setConfirmPassword(e.target.value)}
+                                        value={formData.confirmPassword}
+                                        onChange={handleChange}
                                         required
                                     />
                                 </Form.Group>
