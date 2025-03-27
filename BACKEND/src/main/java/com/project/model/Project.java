@@ -27,16 +27,12 @@ public class Project {
     private Set<Integer> fileId;
 
     @NotBlank()
-    @Field(name = "studentId")
-    private Set<Integer> studentId;
-
-    @NotBlank()
     @Field(name = "teacherId")
     private int teacherId;
 
     @NotBlank()
     @Field(name = "tasks")
-    private Set<Integer> tasks;
+    private Set<Task> tasks;
 
     @NotBlank()
     @Field(name = "students")
