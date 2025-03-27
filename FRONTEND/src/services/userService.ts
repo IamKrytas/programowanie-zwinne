@@ -1,9 +1,10 @@
-import { RegisterFormData, LoginFormData } from "../models/User";
+import { Student } from "../models/Student";
+import { User } from "../models/User";
 
 // Register new user
-export const registerUserService = async (userData: RegisterFormData): Promise<string> => {
+export const registerUserService = async (userData: Student): Promise<string> => {
   const API_URL = "http://localhost:5000";
-  const response = await fetch(`${API_URL}/register`, {
+  const response = await fetch(`${API_URL}/api/v1/auth/register/student`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -14,9 +15,9 @@ export const registerUserService = async (userData: RegisterFormData): Promise<s
 }
 
 // Login existing user
-export const loginUserService = async (userData: LoginFormData): Promise<string> => {
+export const loginUserService = async (userData: User): Promise<string> => {
   const API_URL = "http://localhost:5000";
-  const response = await fetch(`${API_URL}/login`, {
+  const response = await fetch(`${API_URL}/api/v1/auth/login`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

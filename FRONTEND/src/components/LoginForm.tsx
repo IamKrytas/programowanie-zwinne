@@ -1,12 +1,12 @@
 // imports
 import { useState } from 'react';
 import { Button, Card, Col, Container, Form, Row } from 'react-bootstrap';
-import { LoginFormData } from '../models/User';
+import { User } from '../models/User';
 import { loginUser } from '../controllers/userController';
 
 const LoginForm = () => {
 
-    const [formData, setFormData] = useState<LoginFormData>({
+    const [formData, setFormData] = useState<User>({
         email: '',
         password: '',
     });
@@ -55,7 +55,7 @@ const LoginForm = () => {
                                     <Form.Control
                                         type="password"
                                         name="password"
-                                        placeholder="Wprowadź hasło"
+                                        placeholder="Wpisz hasło"
                                         value={formData.password}
                                         onChange={handleChange}
                                         required
@@ -64,9 +64,8 @@ const LoginForm = () => {
 
                                 <Button
                                     variant="primary"
-                                    type="button"
+                                    type="submit"
                                     className="w-100 mb-2"
-                                    onClick={handleSubmit}
                                 >
                                     Zaloguj się
                                 </Button>

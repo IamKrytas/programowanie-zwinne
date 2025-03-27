@@ -1,26 +1,32 @@
 // imports
 import { useState } from 'react';
 import { Button, Card, Col, Container, Form, Row } from 'react-bootstrap';
-import { RegisterFormData } from '../models/User';
+import { Student } from '../models/Student';
 import { registerUser } from '../controllers/userController';
 
 const RegisterForm = () => {
 
-    const [formData, setFormData] = useState<RegisterFormData>({
-        username: '',
+    const [confirmPassword, setConfirmPassword] = useState('');
+    const [formData, setFormData] = useState<Student>({
+        name: '',
+        surname: '',
         email: '',
         password: '',
-        confirmPassword: '',
+        stationary: null,
     });
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
-      };
+    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         console.log(formData);
 
+        if (formData.password !== confirmPassword) {
+            window.alert('Hasła nie są takie same!');
+            return;
+        }
         try {
             const message = await registerUser(formData);
             console.log(message);
@@ -41,12 +47,23 @@ const RegisterForm = () => {
                             <h6 className="text-center mb-3 text-muted"> Utwórz konto, aby korzystać z aplikacji</h6>
                             <Form onSubmit={handleSubmit}>
                                 <Form.Group className="mb-3" controlId="formName">
-                                    <Form.Label>Nazwa użytkownika</Form.Label>
+                                    <Form.Label>Podaj imię</Form.Label>
                                     <Form.Control
                                         type="text"
-                                        name='username'
-                                        placeholder="Wprowadź nazwę"
-                                        value={formData.username}
+                                        name="name"
+                                        placeholder="Wprowadź imię"
+                                        value={formData.name}
+                                        onChange={handleChange}
+                                        required
+                                    />
+                                </Form.Group>
+                                <Form.Group className="mb-3" controlId="formSurname">
+                                    <Form.Label>Podaj nazwisko</Form.Label>
+                                    <Form.Control
+                                        type="text"
+                                        name="surname"
+                                        placeholder="Wprowadź nazwisko"
+                                        value={formData.surname}
                                         onChange={handleChange}
                                         required
                                     />
@@ -56,7 +73,7 @@ const RegisterForm = () => {
                                     <Form.Label>Email</Form.Label>
                                     <Form.Control
                                         type="email"
-                                        name='email'
+                                        name="email"
                                         placeholder="Wprowadź email"
                                         value={formData.email}
                                         onChange={handleChange}
@@ -68,7 +85,7 @@ const RegisterForm = () => {
                                     <Form.Label>Hasło</Form.Label>
                                     <Form.Control
                                         type="password"
-                                        name='password'
+                                        name="password"
                                         placeholder="Wprowadź hasło"
                                         value={formData.password}
                                         onChange={handleChange}
@@ -82,12 +99,35 @@ const RegisterForm = () => {
                                         type="password"
                                         name='confirmPassword'
                                         placeholder="Powtórz hasło"
-                                        value={formData.confirmPassword}
-                                        onChange={handleChange}
+                                        value={confirmPassword}
+                                        onChange={(e) => setConfirmPassword(e.target.value)}
                                         required
                                     />
                                 </Form.Group>
 
+                                <Form.Group className="mb-3 text-center" controlId="formStationary">
+                                    <Form.Label>Podaj sposób nauki</Form.Label>
+                                    <div className="d-flex justify-content-center">
+                                        <Form.Check
+                                            type="radio"
+                                            name="stationary"
+                                            label="Stacjonarnie"
+                                            value="true"
+                                            checked={formData.stationary === true}
+                                            className="me-3"
+                                            required
+                                            onChange={(e) => setFormData({ ...formData, stationary: e.target.value === 'true' })}
+                                        />
+                                        <Form.Check
+                                            type="radio"
+                                            name="stationary"
+                                            label="Niestacjonarnie"
+                                            value="false"
+                                            checked={formData.stationary === false}
+                                            onChange={(e) => setFormData({ ...formData, stationary: e.target.value === 'true' })}
+                                        />
+                                    </div>
+                                </Form.Group>
                                 <Button
                                     variant="primary"
                                     type="submit"
@@ -108,7 +148,7 @@ const RegisterForm = () => {
                     </Card>
                 </Col>
             </Row>
-        </Container>
+        </Container >
     );
 };
 
