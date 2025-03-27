@@ -1,21 +1,28 @@
+import { Student } from "../models/Student";
 import { User } from "../models/User";
 
-// Login exist user
-export const loginUser = async (): Promise<User> => {
-  const API_URL = "localhost:5000"; // dummy, to be changed later
-  const response = await fetch(`${API_URL}/login`);
-  return response.json();
-};
-
 // Register new user
-export const registerUser = async (): Promise<User> => {
-  const API_URL = "localhost:5000"; // dummy, to be changed later
-  const response = await fetch(`${API_URL}/register`);
-  return response.json();
+export const registerUserService = async (userData: Student): Promise<string> => {
+  const API_URL = "http://localhost:5000";
+  const response = await fetch(`${API_URL}/api/v1/auth/register/student`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(userData),
+  });
+  return await response.json();
 }
 
-export const fetchUsers = async (): Promise<User[]> => {
-  const API_URL = "localhost:5000"; // dummy, to be changed later
-  const response = await fetch(`${API_URL}/users`);
-  return response.json();
+// Login existing user
+export const loginUserService = async (userData: User): Promise<string> => {
+  const API_URL = "http://localhost:5000";
+  const response = await fetch(`${API_URL}/api/v1/auth/login`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(userData),
+  });
+  return await response.json();
 }

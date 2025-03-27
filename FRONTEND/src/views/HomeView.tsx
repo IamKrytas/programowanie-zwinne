@@ -1,8 +1,5 @@
 import { Container, Row, Col, Button } from 'react-bootstrap';
 
-// caused import error when calling "npm run build", to be fixed later
-// import 'bootstrap/dist/css/bootstrap.min.css';
-
 const HomeView = () => {
 return (
     <Container fluid className="d-flex flex-column align-items-center justify-content-center vh-100 bg-light">
