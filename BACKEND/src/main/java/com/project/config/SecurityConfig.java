@@ -37,6 +37,7 @@ public class SecurityConfig {
                 .requestMatchers("/login").permitAll()  // Allow access to the login page without authentication
                 .requestMatchers("/admin/**").hasRole("ADMIN")  // Only users with ADMIN role can access /admin/**
                 .requestMatchers("/user/**").hasAnyRole("USER", "ADMIN")  // Only users with USER or ADMIN role can access /user/**
+                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                 .anyRequest().authenticated()  // All other requests require authentication
             )
 
@@ -44,6 +45,8 @@ public class SecurityConfig {
             .formLogin(form -> form
                 .permitAll()  // Allow everyone to access the login page
             )
+            
+            .csrf(csrf -> csrf.ignoringRequestMatchers("/swagger-ui/**", "/v3/api-docs/**"))
 
             // Configure logout
             .logout(logout -> logout

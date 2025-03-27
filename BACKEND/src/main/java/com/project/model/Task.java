@@ -30,10 +30,6 @@ public class Task {
     private int studentId;
 
     @NotBlank()
-    @Field(name = "projectId")
-    private int projectId;
-
-    @NotBlank()
     @Size(min = 2, max = 50, message = "Name should have at least {min} and maximum of {max} characters.")
     @Field(name = "name")
     private String name;

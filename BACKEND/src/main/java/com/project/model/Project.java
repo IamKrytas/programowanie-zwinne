@@ -32,7 +32,7 @@ public class Project {
 
     @NotBlank()
     @Field(name = "tasks")
-    private Set<Integer> tasks;
+    private Set<Task> tasks;
 
     @NotBlank()
     @Field(name = "students")
