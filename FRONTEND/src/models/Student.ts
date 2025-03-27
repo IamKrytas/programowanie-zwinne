@@ -4,4 +4,5 @@ export interface Student {
     surname: string;
     email: string;
     stationary: boolean;
+    password: string;
 }
