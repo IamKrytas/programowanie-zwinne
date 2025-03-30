@@ -1,33 +1,25 @@
-package com.project.services;
+package com.project.service;
 
 import com.project.model.Student;
-import com.project.repositories.StudentRepository;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import com.project.repository.StudentRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class RegistrationService {
 
     private final StudentRepository studentRepository;
-    private final BCryptPasswordEncoder passwordEncoder;
-
-    public RegistrationService(StudentRepository studentRepository) {
-        this.studentRepository = studentRepository;
-        this.passwordEncoder = new BCryptPasswordEncoder();
-    }
+    private final PasswordEncoder passwordEncoder;
 
     public Student registerStudent(Student student) {
-        // Sprawdzenie, czy email już istnieje
         if (studentRepository.findByEmail(student.getEmail()).isPresent()) {
             throw new IllegalArgumentException("Email already exists");
         }
 
-        // Hashowanie hasła
         student.setPassword(passwordEncoder.encode(student.getPassword()));
-        
         student.setId(null);
-
-        // Zapis do bazy danych
         return studentRepository.save(student);
     }
 }

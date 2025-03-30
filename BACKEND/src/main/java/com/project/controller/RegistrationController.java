@@ -1,7 +1,7 @@
-package com.project.controllers;
+package com.project.controller;
 
 import com.project.model.Student;
-import com.project.services.RegistrationService;
+import com.project.service.RegistrationService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
