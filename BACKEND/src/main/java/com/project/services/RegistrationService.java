@@ -24,6 +24,8 @@ public class RegistrationService {
 
         // Hashowanie hasła
         student.setPassword(passwordEncoder.encode(student.getPassword()));
+        
+        student.setId(null);
 
         // Zapis do bazy danych
         return studentRepository.save(student);

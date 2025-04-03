@@ -2,22 +2,23 @@ package com.project.controllers;
 
 import com.project.model.Student;
 import com.project.services.RegistrationService;
+
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/auth/register")
+@RequiredArgsConstructor
 public class RegistrationController {
 
     private final RegistrationService registrationService;
 
-    public RegistrationController(RegistrationService registrationService) {
-        this.registrationService = registrationService;
-    }
-
     @PostMapping("/student")
-    public ResponseEntity<?> registerStudent(@RequestBody Student student) {
+    public ResponseEntity<?> registerStudent(@RequestBody @Valid Student student) {
         try {
             Student registeredStudent = registrationService.registerStudent(student);
             return new ResponseEntity<>(registeredStudent, HttpStatus.CREATED);
