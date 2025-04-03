@@ -16,7 +16,7 @@ import org.springframework.data.mongodb.core.mapping.Field;
 public class Student {
 
     @Id
-    private int id;
+    private String id;
 
     @NotBlank()
     @Size(min = 2, max = 50, message = "Name should have at least {min} and maximum of {max} characters.")
@@ -38,7 +38,7 @@ public class Student {
     private boolean stationary;
 
     @NotBlank()
-    @Size(min = 18, max = 50, message = "Password should have at least {min}.")
+    @Size(min = 8, max = 50, message = "Password should have at least {min}.")
     @Field(name = "password")
     private String password;
 
