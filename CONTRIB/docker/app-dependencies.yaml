@@ -16,29 +16,28 @@
 version: '3.8'
 
 services:
-  ptracker-dev-mongodb:
+  mongo:
     image: mongo:latest
     environment:
-      MONGO_INITDB_ROOT_USERNAME: admin
-      MONGO_INITDB_ROOT_PASSWORD: admin
+      ME_CONFIG_MONGODB_ADMINUSERNAME: admin
+      ME_CONFIG_MONGODB_ADMINPASSWORD: admin
       MONGO_INITDB_DATABASE: ptracker
     volumes:
       - mongo-dev-data:/data/db
     ports:
       - "27017:27017"
 
-  ptracker-dev-mongo-express:
+  mongoexpress:
     image: mongo-express:latest
     environment:
-      ME_CONFIG_MONGODB_SERVER: ptracker-mongodb
+      ME_CONFIG_MONGODB_SERVER: mongo
       ME_CONFIG_MONGODB_ADMINUSERNAME: admin
       ME_CONFIG_MONGODB_ADMINPASSWORD: admin
-      ME_CONFIG_BASICAUTH_USERNAME: admin
-      ME_CONFIG_BASICAUTH_PASSWORD: admin
+      ME_CONFIG_BASICAUTH: false
     ports:
-      - "8081:8085"
+      - "8085:8081"
     depends_on:
-      - ptracker-dev-mongodb
+      - mongo
 
 volumes:
   mongo-dev-data:
