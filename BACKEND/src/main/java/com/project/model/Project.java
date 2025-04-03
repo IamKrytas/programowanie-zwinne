@@ -20,7 +20,7 @@ import java.util.Set;
 public class Project {
 
     @Id
-    private int id;
+    private String id;
 
     @NotBlank()
     @Field(name = "fileId")
