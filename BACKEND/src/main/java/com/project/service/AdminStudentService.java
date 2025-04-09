@@ -4,25 +4,17 @@ import com.project.model.Student;
 import com.project.repository.StudentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
-import java.awt.print.Pageable;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class AdminService {
+public class AdminStudentService {
     private final StudentRepository studentRepository;
 
     public Student getStudentById(String studentId) {
-        var student = studentRepository.findById(studentId);
-        if (student.isPresent()) {
-            return student.get();
-        } else {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Item not found");
-        }
+        return studentRepository.findById(studentId).orElseThrow();
     }
 
     public List<Student> getStudents(int offset, int limit) {
@@ -44,6 +36,12 @@ public class AdminService {
         student.setPassword(student.getPassword());
         student.setStationary(student.isStationary());
         studentRepository.save(student);
+        return student;
+    }
+
+    public Student deleteStudent(String studentId){
+        var student = studentRepository.findById(studentId).orElseThrow();
+        studentRepository.delete(student);
         return student;
     }
 }
