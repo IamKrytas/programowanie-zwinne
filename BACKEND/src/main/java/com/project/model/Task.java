@@ -19,7 +19,7 @@ import java.util.Set;
 public class Task {
 
     @Id
-    private int id;
+    private String id;
 
     @NotBlank()
     @Field(name = "fileId")
