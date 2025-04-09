@@ -2,6 +2,7 @@ package com.project.controller;
 
 import com.project.model.Teacher;
 import com.project.service.AdminTeacherService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,12 +27,12 @@ public class AdminTeacherController {
     }
 
     @PostMapping("/teacher")
-    public Teacher createTeacher(@RequestBody Teacher teacher){return adminTeacherService.createTeacher(teacher);}
+    public Teacher createTeacher(@RequestBody @Valid Teacher teacher){return adminTeacherService.createTeacher(teacher);}
 
     @PutMapping("/teacher/{teacherId}")
-    public Teacher editTeacher(@PathVariable String teacherId, @RequestBody Teacher teacher){return adminTeacherService.editTeacher(teacherId, teacher);}
+    public Teacher editTeacher(@PathVariable String teacherId, @RequestBody @Valid Teacher teacher){return adminTeacherService.editTeacher(teacherId, teacher);}
 
     @DeleteMapping("/teacher/{teacherId}")
-    public Teacher deleteTeacher(@PathVariable String teacherId){return adminTeacherService.deleteStudent(teacherId);}
+    public Teacher deleteTeacher(@PathVariable String teacherId){return adminTeacherService.deleteTeacher(teacherId);}
 
 }

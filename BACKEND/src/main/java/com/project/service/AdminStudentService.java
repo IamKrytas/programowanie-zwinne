@@ -33,8 +33,10 @@ public class AdminStudentService {
         student.setName(data.getName());
         student.setEmail(data.getEmail());
         student.setSurname(data.getSurname());
-        student.setPassword(student.getPassword());
-        student.setStationary(student.isStationary());
+        if (data.getPassword() != null && !data.getPassword().isEmpty()) {
+            student.setPassword(data.getPassword());
+        }
+        student.setStationary(data.isStationary());
         studentRepository.save(student);
         return student;
     }

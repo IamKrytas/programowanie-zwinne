@@ -2,6 +2,7 @@ package com.project.controller;
 
 import com.project.model.Student;
 import com.project.service.AdminStudentService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,10 +27,10 @@ public class AdminStudentController {
     }
 
     @PostMapping("/student")
-    public Student createStudent(@RequestBody Student student){return adminStudentService.createStudent(student);}
+    public Student createStudent(@RequestBody @Valid Student student){return adminStudentService.createStudent(student);}
 
     @PutMapping("/student/{studentId}")
-    public Student editStudent(@PathVariable String studentId, @RequestBody Student student){return adminStudentService.editStudent(studentId, student);}
+    public Student editStudent(@PathVariable String studentId, @RequestBody @Valid Student student ){return adminStudentService.editStudent(studentId, student);}
 
     @DeleteMapping("/student/{studentId}")
     public Student deleteStudent(@PathVariable String studentId){return adminStudentService.deleteStudent(studentId);}

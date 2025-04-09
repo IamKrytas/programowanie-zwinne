@@ -34,12 +34,14 @@ public class AdminTeacherService {
         teacher.setName(data.getName());
         teacher.setEmail(data.getEmail());
         teacher.setSurname(data.getSurname());
-        teacher.setPassword(teacher.getPassword());
+        if (data.getPassword() != null && !data.getPassword().isEmpty()) {
+            teacher.setPassword(data.getPassword());
+        }
         teacherRepository.save(teacher);
         return teacher;
     }
 
-    public Teacher deleteStudent(String teacherId){
+    public Teacher deleteTeacher(String teacherId){
         var teacher = teacherRepository.findById(teacherId).orElseThrow();
         teacherRepository.delete(teacher);
         return teacher;
