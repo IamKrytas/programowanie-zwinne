@@ -17,7 +17,7 @@ import org.springframework.data.mongodb.core.mapping.Field;
 public class Teacher {
 
     @Id
-    private int id;
+    private String id;
 
     @NotBlank()
     @Size(min = 2, max = 50, message = "Name should have at least {min} and maximum of {max} characters.")
