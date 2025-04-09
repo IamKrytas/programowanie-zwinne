@@ -13,6 +13,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Optional;
@@ -27,6 +28,7 @@ public class AuthServiceTest {
     private @Mock StudentRepository studentRepository;
     private @Mock TeacherRepository teacherRepository;
     private @Mock JwtTokenService jwtService;
+    private @Mock PasswordEncoder passwordEncoder;
     private @InjectMocks AuthService authService;
 
     private final String SAMPLE_EMAIL = "email@example.com";
@@ -36,8 +38,7 @@ public class AuthServiceTest {
 
     @Test
     public void login_shouldLoginAsAdminSuccessfully() throws IllegalAccessException {
-        when(jwtService.generateTokenPair(any(), any()))
-                .thenReturn(new JwtTokenPair(SAMPLE_ACCESS_TOKEN, SAMPLE_REFRESH_TOKEN));
+        when(jwtService.generateTokenPair(any(), any())).thenReturn(new JwtTokenPair(SAMPLE_ACCESS_TOKEN, SAMPLE_REFRESH_TOKEN));
         FieldUtils.writeField(authService, "adminDefaultEmail", SAMPLE_EMAIL, true);
         FieldUtils.writeField(authService, "adminDefaultPassword", SAMPLE_PASSWORD, true);
 
@@ -52,12 +53,10 @@ public class AuthServiceTest {
     @Test
     public void login_shouldLoginAsTeacherSuccessfully() throws IllegalAccessException {
         var mockTeacher = new Teacher("id1", "t1", "t1", SAMPLE_EMAIL, SAMPLE_PASSWORD);
-        when(jwtService.generateTokenPair(any(), any()))
-                .thenReturn(new JwtTokenPair(SAMPLE_ACCESS_TOKEN, SAMPLE_REFRESH_TOKEN));
-        when(teacherRepository.findByEmailAndPassword(SAMPLE_EMAIL, SAMPLE_PASSWORD))
-                .thenReturn(Optional.of(mockTeacher));
-        when(studentRepository.findByEmailAndPassword(SAMPLE_EMAIL, SAMPLE_PASSWORD))
-                .thenReturn(Optional.empty());
+        when(jwtService.generateTokenPair(any(), any())).thenReturn(new JwtTokenPair(SAMPLE_ACCESS_TOKEN, SAMPLE_REFRESH_TOKEN));
+        when(teacherRepository.findByEmail(SAMPLE_EMAIL)).thenReturn(Optional.of(mockTeacher));
+        when(studentRepository.findByEmail(SAMPLE_EMAIL)).thenReturn(Optional.empty());
+        when(passwordEncoder.matches(SAMPLE_PASSWORD, SAMPLE_PASSWORD)).thenReturn(true);
 
         var generatedTokens = authService.login(new LoginCredentials(SAMPLE_EMAIL, SAMPLE_PASSWORD));
         assertThat(generatedTokens.getAccessToken()).isEqualTo(SAMPLE_ACCESS_TOKEN);
@@ -68,10 +67,9 @@ public class AuthServiceTest {
     @Test
     public void login_shouldLoginAsStudentSuccessfully() throws IllegalAccessException {
         var mockStudent = new Student("s1", "s1", "s1", SAMPLE_EMAIL, true, SAMPLE_PASSWORD);
-        when(jwtService.generateTokenPair(any(), any()))
-                .thenReturn(new JwtTokenPair(SAMPLE_ACCESS_TOKEN, SAMPLE_REFRESH_TOKEN));
-        when(studentRepository.findByEmailAndPassword(SAMPLE_EMAIL, SAMPLE_PASSWORD))
-                .thenReturn(Optional.of(mockStudent));
+        when(jwtService.generateTokenPair(any(), any())).thenReturn(new JwtTokenPair(SAMPLE_ACCESS_TOKEN, SAMPLE_REFRESH_TOKEN));
+        when(studentRepository.findByEmail(SAMPLE_EMAIL)).thenReturn(Optional.of(mockStudent));
+        when(passwordEncoder.matches(SAMPLE_PASSWORD, SAMPLE_PASSWORD)).thenReturn(true);
 
         var tokens = authService.login(new LoginCredentials(SAMPLE_EMAIL, SAMPLE_PASSWORD));
         assertThat(tokens.getAccessToken()).isEqualTo(SAMPLE_ACCESS_TOKEN);
@@ -81,10 +79,8 @@ public class AuthServiceTest {
 
     @Test
     public void login_shouldThrowHttp401WhenCredentialsAreInvalid() {
-        when(studentRepository.findByEmailAndPassword(SAMPLE_EMAIL, SAMPLE_PASSWORD))
-                .thenReturn(Optional.empty());
-        when(teacherRepository.findByEmailAndPassword(SAMPLE_EMAIL, SAMPLE_PASSWORD))
-                .thenReturn(Optional.empty());
+        when(studentRepository.findByEmail(SAMPLE_EMAIL)).thenReturn(Optional.empty());
+        when(teacherRepository.findByEmail(SAMPLE_EMAIL)).thenReturn(Optional.empty());
 
         var exception = org.junit.jupiter.api.Assertions.assertThrows(ResponseStatusException.class, () ->
             authService.login(new LoginCredentials(SAMPLE_EMAIL, SAMPLE_PASSWORD)
