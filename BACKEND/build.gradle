@@ -28,6 +28,10 @@ dependencies {
 	implementation 'io.jsonwebtoken:jjwt:0.12.3'
 
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.mockito:mockito-core:3.12.4'
+    testImplementation 'org.assertj:assertj-core:3.21.0'
+    testImplementation 'org.springframework.security:spring-security-test:6.0.0'
+   
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
 	compileOnly 'org.projectlombok:lombok:1.18.30'
