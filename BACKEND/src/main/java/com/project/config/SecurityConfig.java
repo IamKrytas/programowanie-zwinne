@@ -17,46 +17,39 @@ public class SecurityConfig {
      * This method defines access rules for various endpoints, such as public routes and restricted routes.
      */
     @SuppressWarnings("removal")
-	@Bean
+    @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
-            // Disable CSRF for /public/** endpoints (no CSRF protection for these)
-            .csrf(csrf -> csrf.ignoringRequestMatchers("/public/**"))
+            // Łączymy wszystkie wykluczenia CSRF w jednym miejscu
+            .csrf(csrf -> csrf.ignoringRequestMatchers("/public/**", "/swagger-ui/**", "/v3/api-docs/**"))
 
-            // Configures session management
             .sessionManagement()
-            .sessionFixation().migrateSession() // Migrate session after login to avoid session fixation
-            .maximumSessions(1)  // Limit the number of active sessions per user
-            .expiredUrl("/login?expired")  // Redirect to login page if session expires
-            .and()
+                .sessionFixation().migrateSession()
+                .maximumSessions(1)
+                .expiredUrl("/login?expired")
+                .and()
             .and()
 
-            // Configures authorization rules for HTTP requests using authorizeHttpRequests
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/public/**").permitAll()  // Allow access to public endpoints without authentication
-                .requestMatchers("/login").permitAll()  // Allow access to the login page without authentication
-                .requestMatchers("/admin/**").hasRole("ADMIN")  // Only users with ADMIN role can access /admin/**
-                .requestMatchers("/user/**").hasAnyRole("USER", "ADMIN")  // Only users with USER or ADMIN role can access /user/**
+                .requestMatchers("/public/**").permitAll()
+                .requestMatchers("/login").permitAll()
+                .requestMatchers("/admin/**").hasRole("ADMIN")
+                .requestMatchers("/user/**").hasAnyRole("USER", "ADMIN")
                 .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
-                .anyRequest().authenticated()  // All other requests require authentication
+                .anyRequest().authenticated()
             )
 
-            // Configures login with default login page
-            .formLogin(form -> form
-                .permitAll()  // Allow everyone to access the login page
-            )
-            
-            .csrf(csrf -> csrf.ignoringRequestMatchers("/swagger-ui/**", "/v3/api-docs/**"))
+            .formLogin(form -> form.permitAll())
 
-            // Configure logout
             .logout(logout -> logout
-                .logoutUrl("/logout")  // URL to trigger logout
-                .logoutSuccessUrl("/login?logout")  // Redirect to login page after logout
-                .permitAll()  // Allow everyone to access the logout functionality
+                .logoutUrl("/logout")
+                .logoutSuccessUrl("/login?logout")
+                .permitAll()
             );
 
-        return httpSecurity.build();  // Builds and returns the security configuration
+        return httpSecurity.build();
     }
+
 
     /**
      * Defines a fake UserDetailsService that always returns the same users (admin and user).

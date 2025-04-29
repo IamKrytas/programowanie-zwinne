@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
+import jakarta.validation.constraints.NotNull;
+
 
 @Data
 @NoArgsConstructor
@@ -33,7 +35,6 @@ public class Student {
     @Field(name = "email")
     private String email;
 
-    @NotBlank()
     @Field(name = "stationary")
     private boolean stationary;
 
