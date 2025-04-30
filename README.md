@@ -1,9 +1,7 @@
-
----
-
 # 🗂️ Agile Project Manager
 
 > Web application for organizing projects and tasks, built using React & Spring Boot.
+
 
 ![CI/CD Status](https://github.com/IamKrytas/programowanie-zwinne/actions/workflows/build.yml/badge.svg)
 
@@ -19,29 +17,28 @@ The system is composed of:
 
 ---
 
-## 🛠 Technologies
 
-### Frontend:
-- React
-- TypeScript
-- Vite
+## 💠 Technologies
 
-### Backend:
-- Kotlin
-- Spring Boot
-- Gradle
-- Spring Security
+| Frontend          | Backend        |
+|-------------------|----------------|
+| React             | Spring Boot    |
+| TypeScript        | Java           |
+| Vite              | Gradle         |
+|                   | MongoDB        |
 
 ---
-
 ## ⚙️ Requirements
 
-- Java 21  
-- Node.js (latest LTS recommended)
+| Technology         | Version             |
+|--------------------|---------------------|
+| Java               | 21+                 |
+| Node.js            | Latest LTS          |
 
 ---
 
 ## 🚀 Installation and Running
+
 
 ### 1️⃣ Clone the repository
 
@@ -73,7 +70,7 @@ npm run dev
 ```
 
 ➡️ The frontend will be available at:  
-`http://localhost:8080/`
+`http://localhost:5173/`
 
 ---
 
@@ -99,8 +96,39 @@ Build the project and start the Spring Boot server:
 ## 📂 Project Structure
 
 ```
-
+.
+├── .github
+│   └── workflows
+├── BACKEND
+│   ├── .gradle
+│   ├── bin
+│   ├── build
+│   ├── build.gradle
+│   ├── gradle
+│   ├── gradlew
+│   ├── gradlew.bat
+│   ├── settings.gradle
+│   └── src
+├── CONTRIB
+├── FRONTEND
+│   ├── index.html
+│   ├── package-lock.json
+│   ├── package.json
+│   ├── projekt
+│   ├── public
+│   ├── README.md
+│   ├── src
+│   ├── tsconfig.app.json
+│   ├── tsconfig.json
+│   ├── tsconfig.node.json
+│   └── vite.config.ts
+├── README.md
+├── update_languages.py
+└── update_structure.py
 ```
+## 🎬 Demo
+
+![Agile Project Manager Screenshot](https://raw.githubusercontent.com/IamKrytas/programowanie-zwinne/main/demo/screenshot.png)
 
 ---
 
@@ -134,15 +162,18 @@ HTML         1.4%
 
 This project was created as part of an assignment for the **Agile Programming** course at the **Bydgoszcz University of Science and Technology**.
 
+
+
+
+
 ---
 
-## ⚙️ Possible Improvements
 
+## ✍️ Contributors
 
----
-
-## ✍️ Authors
-
+| <img src="https://avatars.githubusercontent.com/u/32397526?v=4&s=100" width="100" height="100"> | <img src="https://avatars.githubusercontent.com/u/92470000?v=4&s=100" width="100" height="100"> | <img src="https://avatars.githubusercontent.com/u/96568740?v=4&s=100" width="100" height="100"> | <img src="https://avatars.githubusercontent.com/u/98387159?v=4&s=100" width="100" height="100"> | <img src="https://avatars.githubusercontent.com/u/202075381?v=4&s=100" width="100" height="100"> |
+|:--:|:--:|:--:|:--:|:--:|
+| [@danrog303](https://github.com/danrog303) | [@Kyandi0](https://github.com/Kyandi0) | [@IamKrytas](https://github.com/IamKrytas) | [@LikeCiastka](https://github.com/LikeCiastka) | [@Pawel-234](https://github.com/Pawel-234) |
 
 
 ---
@@ -152,4 +183,3 @@ This project was created as part of an assignment for the **Agile Programming** 
 This project is licensed under the [MIT License](LICENSE).
 
 ---
-

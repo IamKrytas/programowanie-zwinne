@@ -1,0 +1,37 @@
+name: 🔁 Update README (languages & structure)
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: '0 0 * * 1' # every Monday
+  workflow_dispatch:
+
+jobs:
+  update-readme:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Update languages
+        run: python update_languages.py
+
+      - name: Update structure
+        run: python update_structure.py
+
+      - name: Commit & push if changed
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add README.md
+          git commit -m "🔄 Auto-update README (languages & structure)" || echo "No changes"
+          git push
