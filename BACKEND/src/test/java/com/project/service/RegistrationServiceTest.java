@@ -1,10 +1,11 @@
-package com.project.services;
+package com.project.service;
 
 import com.project.model.Student;
-import com.project.repositories.StudentRepository;
+import com.project.repository.StudentRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import com.project.service.RegistrationService;
 
 import java.util.Optional;
 
@@ -64,4 +65,5 @@ public class RegistrationServiceTest {
             .hasMessageContaining("Email already exists"); // Sprawdzenie komunikatu
     }
 }
+
 

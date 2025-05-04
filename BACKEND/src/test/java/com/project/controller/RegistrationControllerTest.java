@@ -1,16 +1,16 @@
-package com.project.controllers;
+package com.project.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.model.Student;
-import com.project.services.RegistrationService;
+import com.project.service.RegistrationService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.security.test.context.support.WithMockUser;
-
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -18,7 +18,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 
-@WebMvcTest(RegistrationController.class)
+@SpringBootTest
+@AutoConfigureMockMvc
 public class RegistrationControllerTest {
 
     @Autowired
@@ -38,18 +39,17 @@ public class RegistrationControllerTest {
         student.setSurname("Doe");
         student.setEmail("test@example.com");
         student.setPassword("password123");
-        student.setStationary(true); // boolean — nie można używać @NotBlank!
+        student.setStationary(true);
 
         when(registrationService.registerStudent(any(Student.class))).thenReturn(student);
 
         mockMvc.perform(post("/api/v1/auth/register/student")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(student))
-                .with(csrf()))
-            .andExpect(status().isCreated())
-            .andExpect(jsonPath("$.email").value("test@example.com"));
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(student))
+                        .with(csrf()))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.email").value("test@example.com"));
     }
-
 
     @Test
     @WithMockUser(username = "user", roles = {"USER"})
@@ -62,14 +62,15 @@ public class RegistrationControllerTest {
         student.setStationary(false);
 
         when(registrationService.registerStudent(any(Student.class)))
-            .thenThrow(new IllegalArgumentException("Email already exists"));
+                .thenThrow(new IllegalArgumentException("Email already exists"));
 
         mockMvc.perform(post("/api/v1/auth/register/student")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(student))
-                .with(csrf()))
-            .andExpect(status().isBadRequest())
-            .andExpect(content().string("Email already exists"));
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(student))
+                        .with(csrf()))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string("Email already exists"));
     }
 }
+
 
