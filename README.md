@@ -128,7 +128,7 @@ Build the project and start the Spring Boot server:
 ```
 ## 🎬 Demo
 
-![Agile Project Manager Screenshot](https://raw.githubusercontent.com/IamKrytas/programowanie-zwinne/main/demo/screenshot.png)
+![Agile Project Manager Screenshot](https://github.com/user-attachments/assets/f7ecb29b-f29e-4adc-bdd3-de954e3778cd)
 
 ---
 
