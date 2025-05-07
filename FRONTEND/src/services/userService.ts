@@ -24,5 +24,10 @@ export const loginUserService = async (userData: User): Promise<string> => {
     },
     body: JSON.stringify(userData),
   });
-  return await response.json();
+  const data = await response.json();
+  const accessToken = data.token;
+  const refreshToken = data.refreshToken
+  sessionStorage.setItem("token", accessToken);
+  sessionStorage.setItem("refreshToken", refreshToken);
+  return data;
 }
