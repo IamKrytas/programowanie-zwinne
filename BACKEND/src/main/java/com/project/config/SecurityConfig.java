@@ -25,15 +25,12 @@ public class SecurityConfig {
         return httpSecurity
             // Wstawiamy filtr JWT przed UsernamePasswordAuthenticationFilter
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-
             // Wyłączamy CSRF tylko dla swaggera i endpointów publicznych
-            .csrf(csrf -> csrf.ignoringRequestMatchers("/public/**", "/swagger-ui/**", "/v3/api-docs/**"))
-
+            .csrf(csrf -> csrf.disable())
             // Zarządzanie sesją
             .sessionManagement(session -> session
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             )
-
             // Autoryzacja żądań
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/public/**", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
@@ -41,42 +38,11 @@ public class SecurityConfig {
                 .requestMatchers("/api/v1/auth/**").permitAll()
                 .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
                 .requestMatchers("/api/v1/user/**").hasAnyRole("USER", "ADMIN")
-                .anyRequest().authenticated()
+                .anyRequest().permitAll()
             )
-
-            // Umożliwienie formLogin na potrzeby debugowania/testów (jeśli nie JWT)
-            .formLogin(form -> form.permitAll())
-
-            // Konfiguracja logoutu
-            .logout(logout -> logout
-                .logoutUrl("/logout")
-                .logoutSuccessUrl("/login?logout")
-                .permitAll()
-            )
-
             .build();
     }
 
-    /**
-     * Wbudowany UserDetailsService – do celów testowych.
-     */
-    @Bean
-    public UserDetailsService userDetailsService() {
-        return new InMemoryUserDetailsManager(
-            User.withUsername("admin")
-                .password(passwordEncoder().encode("admin123"))
-                .roles("ADMIN")
-                .build(),
-            User.withUsername("user")
-                .password(passwordEncoder().encode("user123"))
-                .roles("USER")
-                .build()
-        );
-    }
-
-    /**
-     * Bcrypt do haszowania haseł.
-     */
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
