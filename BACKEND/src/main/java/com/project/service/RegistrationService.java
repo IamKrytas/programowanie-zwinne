@@ -23,3 +23,5 @@ public class RegistrationService {
         return studentRepository.save(student);
     }
 }
+
+

@@ -2,46 +2,50 @@ package com.project.config;
 
 import com.project.config.filters.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @RequiredArgsConstructor
 public class SecurityConfig {
+
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
-    /**
-     * Configures security settings for HTTP requests.
-     * This method defines access rules for various endpoints, such as public routes and restricted routes.
-     */
-	@Bean
-    @SneakyThrows(Exception.class)
-    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) {
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity
-            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)  // Adds JWT authentication filter
-            .csrf(AbstractHttpConfigurer::disable)
-            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            // Wstawiamy filtr JWT przed UsernamePasswordAuthenticationFilter
+            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+            // Wyłączamy CSRF tylko dla swaggera i endpointów publicznych
+            .csrf(csrf -> csrf.disable())
+            // Zarządzanie sesją
+            .sessionManagement(session -> session
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            )
+            // Autoryzacja żądań
             .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/public/**", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                .requestMatchers("/login").permitAll()
+                .requestMatchers("/api/v1/auth/**").permitAll()
                 .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
-                .requestMatchers("/api/v1/auth/**").anonymous()
+                .requestMatchers("/api/v1/user/**").hasAnyRole("USER", "ADMIN")
                 .anyRequest().permitAll()
-            ).build();
+            )
+            .build();
     }
 
-    /**
-     * Configures the password encoder using BCrypt.
-     * This encoder is used to securely hash passwords.
-     */
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();  // Uses BCrypt for secure password hashing
+        return new BCryptPasswordEncoder();
     }
 }
+
