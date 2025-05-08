@@ -18,8 +18,16 @@ jobs:
             cache: gradle
       
       - name: Build with Gradle
-        run: chmod a+x ./gradlew && ./gradlew clean build
+        run: chmod a+x ./gradlew && ./gradlew clean test jacocoTestReport
         working-directory: ./BACKEND
+      
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: BACKEND/build/reports/jacoco/test/jacocoTestReport.xml
+          flags: unittests
+          name: codecov-coverage
       
   build_frontend:
     name: Build frontend
