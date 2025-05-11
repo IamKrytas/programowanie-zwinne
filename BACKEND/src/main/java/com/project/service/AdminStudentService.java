@@ -4,6 +4,7 @@ import com.project.model.Student;
 import com.project.repository.StudentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -12,6 +13,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AdminStudentService {
     private final StudentRepository studentRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public Student getStudentById(String studentId) {
         return studentRepository.findById(studentId).orElseThrow();
@@ -24,6 +26,10 @@ public class AdminStudentService {
 
     public Student createStudent(Student student) {
         student.setId(null);
+        student.setPassword(passwordEncoder.encode(student.getPassword()));
+        if (studentRepository.findByEmail(student.getEmail()).isPresent()) {
+            throw new IllegalArgumentException("Email already exists");
+        }
         studentRepository.save(student);
         return student;
     }
@@ -31,10 +37,16 @@ public class AdminStudentService {
     public Student editStudent(String studentId, Student data){
         var student = studentRepository.findById(studentId).orElseThrow();
         student.setName(data.getName());
-        student.setEmail(data.getEmail());
         student.setSurname(data.getSurname());
         if (data.getPassword() != null && !data.getPassword().isEmpty()) {
-            student.setPassword(data.getPassword());
+            student.setPassword(passwordEncoder.encode(data.getPassword()));
+        }
+        if (data.getEmail().equals(student.getEmail())) {
+            student.setEmail(data.getEmail());
+        } else if (studentRepository.findByEmail(data.getEmail()).isPresent()) {
+            throw new IllegalArgumentException("Email already exists");
+        } else {
+            student.setEmail(data.getEmail());
         }
         student.setStationary(data.isStationary());
         studentRepository.save(student);
