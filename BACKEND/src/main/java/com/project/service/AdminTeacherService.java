@@ -5,6 +5,7 @@ import com.project.model.Teacher;
 import com.project.repository.TeacherRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -13,6 +14,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AdminTeacherService {
     private final TeacherRepository teacherRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public Teacher getTeacherById(String teacherId) {
         return teacherRepository.findById(teacherId).orElseThrow();
@@ -25,6 +27,10 @@ public class AdminTeacherService {
 
     public Teacher createTeacher(Teacher teacher) {
         teacher.setId(null);
+        teacher.setPassword(passwordEncoder.encode(teacher.getPassword()));
+        if (teacherRepository.findByEmail(teacher.getEmail()).isPresent()) {
+            throw new IllegalArgumentException("Email already exists");
+        }
         teacherRepository.save(teacher);
         return teacher;
     }
@@ -32,10 +38,16 @@ public class AdminTeacherService {
     public Teacher editTeacher(String teacherId, Teacher data){
         var teacher = teacherRepository.findById(teacherId).orElseThrow();
         teacher.setName(data.getName());
-        teacher.setEmail(data.getEmail());
         teacher.setSurname(data.getSurname());
         if (data.getPassword() != null && !data.getPassword().isEmpty()) {
-            teacher.setPassword(data.getPassword());
+            teacher.setPassword(passwordEncoder.encode(data.getPassword()));
+        }
+        if (data.getEmail().equals(teacher.getEmail())) {
+            teacher.setEmail(data.getEmail());
+        } else if (teacherRepository.findByEmail(data.getEmail()).isPresent()) {
+            throw new IllegalArgumentException("Email already exists");
+        } else {
+            teacher.setEmail(data.getEmail());
         }
         teacherRepository.save(teacher);
         return teacher;
