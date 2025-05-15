@@ -1,6 +1,6 @@
 import { Student } from "../models/Student";
 import { User } from "../models/User";
-import { decodeAccessToken } from "../utils/DecodeTokens";
+import { decodeAccessToken, decodeRefreshToken } from "../utils/DecodeTokens";
 
 // Register new user
 export const registerUserService = async (userData: Student): Promise<string> => {
@@ -39,6 +39,7 @@ export const loginUserService = async (userData: User): Promise<string> => {
   const accessToken = data.token;
   const refreshToken = data.refreshToken
   decodeAccessToken(accessToken);
+  decodeRefreshToken(refreshToken);
   sessionStorage.setItem("token", accessToken);
   sessionStorage.setItem("refreshToken", refreshToken);
   return data;
