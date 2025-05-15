@@ -3,6 +3,7 @@ import { jwtDecode } from "jwt-decode";
 interface DecodedToken {
   role: string;
   sub: string;
+  exp: number;
   [key: string]: any;
 }
 
@@ -13,9 +14,9 @@ export const decodeAccessToken = (accessToken: string): void => {
     const { role, sub, exp } = decoded;
 
     if (role && sub && exp) {
-      sessionStorage.setItem("role", role);
-      sessionStorage.setItem("sub", sub);
-      sessionStorage.setItem("exp", exp.toString());
+      sessionStorage.setItem("accessRole", role);
+      sessionStorage.setItem("accessSub", sub);
+      sessionStorage.setItem("accessExp", exp.toString());
     } else {
       console.warn("Nie udało się zapisać danych z tokena");
     }
@@ -31,9 +32,9 @@ export const decodeRefreshToken = (refreshToken: string): void => {
     const { role, sub, exp } = decoded;
 
     if (role && sub && exp) {
-      sessionStorage.setItem("role", role);
-      sessionStorage.setItem("sub", sub);
-      sessionStorage.setItem("exp", exp.toString());
+      sessionStorage.setItem("refreshRole", role);
+      sessionStorage.setItem("refreshSub", sub);
+      sessionStorage.setItem("refreshExp", exp.toString());
     } else {
       console.warn("Nie udało się zapisać danych z tokena");
     }
