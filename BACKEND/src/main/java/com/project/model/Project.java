@@ -1,6 +1,7 @@
 package com.project.model;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -22,38 +23,40 @@ public class Project {
     @Id
     private String id;
 
-    @NotBlank()
+    @NotEmpty(message = "fileId cannot be empty")
     @Field(name = "fileId")
     private Set<Integer> fileId;
 
-    @NotBlank()
+    @NotBlank(message = "teacherId cannot be blank")
     @Field(name = "teacherId")
-    private int teacherId;
+    private String teacherId;
 
-    @NotBlank()
+    @NotEmpty(message = "tasks cannot be empty")
     @Field(name = "tasks")
     private Set<Task> tasks;
 
-    @NotBlank()
+    @NotEmpty(message = "students cannot be empty")
     @Field(name = "students")
-    private Set<Integer> students;
+    private Set<String> students;
 
-    @NotBlank()
+    @NotEmpty(message = "assignedStudents cannot be empty")
+    @Field(name = "assignedStudents")
+    private Set<String> assignedStudents;
+
+    @NotBlank
     @Size(min = 2, max = 50, message = "Name should have at least {min} and maximum of {max} characters.")
     @Field(name = "name")
     private String name;
 
-    @NotBlank()
+    @NotBlank
     @Size(min = 10, max = 200, message = "Description should have at least {min} and maximum of {max} characters.")
     @Field(name = "description")
     private String description;
 
-    @CreatedDate
     @Field(name = "doneDate")
     private LocalDateTime doneDate;
 
     @CreatedDate
     @Field(name = "creationDate")
     private LocalDateTime creationDate;
-
 }

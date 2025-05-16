@@ -25,7 +25,7 @@ services:
     volumes:
       - mongo-dev-data:/data/db
     ports:
-      - "27017:27017"
+      - "5005:27017"
 
   mongoexpress:
     image: mongo-express:latest
@@ -33,7 +33,7 @@ services:
       ME_CONFIG_MONGODB_SERVER: mongo
       ME_CONFIG_MONGODB_ADMINUSERNAME: admin
       ME_CONFIG_MONGODB_ADMINPASSWORD: admin
-      ME_CONFIG_BASICAUTH: false
+      ME_CONFIG_BASICAUTH: "false"
     ports:
       - "8085:8081"
     depends_on:
