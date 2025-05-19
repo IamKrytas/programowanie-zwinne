@@ -20,8 +20,8 @@ const LoginForm = () => {
         console.log(formData);
 
         try {
-            const message = await loginUser(formData);
-            console.log(message);
+            await loginUser(formData);
+            window.location.href = '/home';
         }
         catch (error) {
             console.error(error);
@@ -41,7 +41,7 @@ const LoginForm = () => {
                                 <Form.Group className="mb-3" controlId="formEmail">
                                     <Form.Label>Email</Form.Label>
                                     <Form.Control
-                                        type="email"
+                                        type="text"
                                         name="email"
                                         placeholder="Wpisz adres e-mail"
                                         value={formData.email}
