@@ -69,7 +69,7 @@ public class AdminStudentServiceTest {
     }
 
     @Test
-    public void test_createStudent_shouldCreateNewStudentWhenEmialNotExistsInDatabase() throws Exception {
+    public void test_createStudent_shouldCreateNewStudentWhenEmailNotExistsInDatabase() throws Exception {
         Student newStudent = new Student();
         newStudent.setId("1233");
         newStudent.setEmail("a@c.com");
@@ -131,6 +131,23 @@ public class AdminStudentServiceTest {
     }
 
     @Test
+    public void test_deleteStudent_shouldDeleteStudentWhenExistsInDatabase() throws Exception {
+        String studentId = "123";
+        Student mockedStudent = new Student(studentId, "An", "Cz", "a@c.com", true, "pass");
+        when(studentRepository.findById(studentId)).thenReturn(Optional.of(mockedStudent));
+
+        Student deletedStudent = adminStudentService.deleteStudent(studentId);
+
+        // then
+        assertThat(deletedStudent).isNotNull();
+        assertThat(deletedStudent.getId()).isEqualTo("123");
+
+        verify(studentRepository).findById(studentId);
+        verify(studentRepository).delete(mockedStudent);
+
+    }
+
+    @Test
     public void test_getStudentById_shouldThrowExceptionWhenNotExistsInDatabase() throws Exception {
         when(studentRepository.findById(Mockito.any())).thenReturn(Optional.empty());
 
@@ -139,6 +156,19 @@ public class AdminStudentServiceTest {
         }).isInstanceOf(NoSuchElementException.class);
 
         verify(studentRepository, times(1)).findById(Mockito.any());
+    }
+
+    @Test
+    public void test_createStudent_shouldThrowExceptionWhenEmailExistsInDatabase() throws Exception {
+        Student mockedStudent = new Student("123", "An", "Cz", "a@c.com", true, "pass");
+        when(studentRepository.findByEmail("a@c.com")).thenReturn(Optional.of(mockedStudent));
+
+        assertThatThrownBy(() -> adminStudentService.createStudent(mockedStudent))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Email already exists");
+
+        verify(studentRepository, times(1)).findByEmail("a@c.com");
+        verify(studentRepository, never()).save(any());
     }
 
 }
