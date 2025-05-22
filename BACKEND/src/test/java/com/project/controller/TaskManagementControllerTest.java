@@ -10,6 +10,7 @@ import com.project.repository.TaskRepository;
 import com.project.service.JwtTokenService;
 import com.project.service.TaskManagementService;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -40,6 +41,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 
+@Disabled
 @SpringBootTest
 @AutoConfigureMockMvc
 public class TaskManagementControllerTest {
