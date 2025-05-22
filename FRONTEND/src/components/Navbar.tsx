@@ -1,4 +1,5 @@
 import { Navbar, Nav, Container } from 'react-bootstrap';
+import { logoutUserService } from '../services/userService';
 
 const NavigationBar = () => {
   return (
@@ -12,6 +13,10 @@ const NavigationBar = () => {
             <Nav.Link href="#uczestnicy">Uczestnicy</Nav.Link>
             <Nav.Link href="#zadania">Zadania</Nav.Link>
             <Nav.Link href="#profil">Profil</Nav.Link>
+            <Nav.Link onClick={logoutUserService}>
+              Wyloguj
+            </Nav.Link>
+
           </Nav>
         </Navbar.Collapse>
       </Container>
