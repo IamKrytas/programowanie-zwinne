@@ -22,7 +22,7 @@ export const registerUserService = async (userData: Student): Promise<string> =>
 
 // Login existing user
 export const loginUserService = async (userData: User): Promise<string> => {
-  const API_URL = "http://localhost:8080";
+  const API_URL = "http://localhost:5000";
   const response = await fetch(`${API_URL}/api/v1/auth/login`, {
     method: "POST",
     headers: {
@@ -66,4 +66,21 @@ export const refreshTokenService = async (): Promise<string> => {
   sessionStorage.setItem("token", accessToken);
   decodeAccessToken(accessToken);
   return data;
+}
+
+export const logoutUserService = async (): Promise<void> => {
+  try {
+    sessionStorage.removeItem("token");
+    sessionStorage.removeItem("refreshToken");
+    sessionStorage.removeItem("refreshSub");
+    sessionStorage.removeItem("refreshRole");
+    sessionStorage.removeItem("refreshExp");
+    sessionStorage.removeItem("accessSub");
+    sessionStorage.removeItem("accessRole");
+    sessionStorage.removeItem("accessExp");
+  }
+  catch (error) {
+    console.error("Błąd podczas wylogowywania:", error);
+  }
+  window.location.reload();
 }
