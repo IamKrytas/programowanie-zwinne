@@ -46,9 +46,19 @@ public class AdminStudentServiceTest {
         verify(studentRepository, times(1)).findById(Mockito.any());
 
     }
+    @Test
+    public void test_getStudentById_shouldThrowExceptionWhenNotExistsInDatabase() throws Exception {
+        when(studentRepository.findById(Mockito.any())).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> {
+            adminStudentService.getStudentById("12334");
+        }).isInstanceOf(NoSuchElementException.class);
+
+        verify(studentRepository, times(1)).findById(Mockito.any());
+    }
 
     @Test
-    public void test_getStudentList_shouldReturnStudentListWhenExistsInDatabase() throws Exception {
+    public void test_getStudents_shouldReturnStudentListWhenExistsInDatabase() throws Exception {
         List<Student> mockedStudents = new ArrayList<>();
         mockedStudents.add(new Student("123", "An", "Cz", "a@c.com", true, "pass"));
         mockedStudents.add(new Student("133", "Bn", "Dz", "b@d.com", false, "pass1"));
@@ -81,18 +91,29 @@ public class AdminStudentServiceTest {
         when(passwordEncoder.encode("pass")).thenReturn("passEncoded");
         when(studentRepository.save(any(Student.class))).thenReturn(newStudent);
 
-        Student creaatedStudent = adminStudentService.createStudent(newStudent);
+        Student createdStudent = adminStudentService.createStudent(newStudent);
 
-        assertThat(creaatedStudent).isNotNull();
-        assertThat(creaatedStudent.getEmail()).isEqualTo("a@c.com");
-        assertThat(creaatedStudent.getPassword()).isEqualTo("passEncoded");
+        assertThat(createdStudent).isNotNull();
+        assertThat(createdStudent.getEmail()).isEqualTo("a@c.com");
+        assertThat(createdStudent.getPassword()).isEqualTo("passEncoded");
 
         verify(studentRepository, times(1)).findByEmail("a@c.com");
         verify(passwordEncoder, times(1)).encode("pass");
         verify(studentRepository, times(1)).save(any(Student.class));
 
     }
+    @Test
+    public void test_createStudent_shouldThrowExceptionWhenEmailExistsInDatabase() throws Exception {
+        Student mockedStudent = new Student("123", "An", "Cz", "a@c.com", true, "pass");
+        when(studentRepository.findByEmail("a@c.com")).thenReturn(Optional.of(mockedStudent));
 
+        assertThatThrownBy(() -> adminStudentService.createStudent(mockedStudent))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Email already exists");
+
+        verify(studentRepository, times(1)).findByEmail("a@c.com");
+        verify(studentRepository, never()).save(any());
+    }
     @Test
     public void test_editStudent_shouldEditStudentWhenExistsInDatabase() throws Exception {
         String studentId = "123";
@@ -112,7 +133,6 @@ public class AdminStudentServiceTest {
         editedStudent.setStationary(true);
         when(studentRepository.findById(studentId)).thenReturn(Optional.of(existingStudent));
         when(passwordEncoder.encode("newPassword")).thenReturn("enNewPass");
-        //when(studentRepository.save(any(Student.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         Student edited = adminStudentService.editStudent(studentId, editedStudent);
 
@@ -145,30 +165,6 @@ public class AdminStudentServiceTest {
         verify(studentRepository).findById(studentId);
         verify(studentRepository).delete(mockedStudent);
 
-    }
-
-    @Test
-    public void test_getStudentById_shouldThrowExceptionWhenNotExistsInDatabase() throws Exception {
-        when(studentRepository.findById(Mockito.any())).thenReturn(Optional.empty());
-
-        assertThatThrownBy(() -> {
-            adminStudentService.getStudentById("12334");
-        }).isInstanceOf(NoSuchElementException.class);
-
-        verify(studentRepository, times(1)).findById(Mockito.any());
-    }
-
-    @Test
-    public void test_createStudent_shouldThrowExceptionWhenEmailExistsInDatabase() throws Exception {
-        Student mockedStudent = new Student("123", "An", "Cz", "a@c.com", true, "pass");
-        when(studentRepository.findByEmail("a@c.com")).thenReturn(Optional.of(mockedStudent));
-
-        assertThatThrownBy(() -> adminStudentService.createStudent(mockedStudent))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Email already exists");
-
-        verify(studentRepository, times(1)).findByEmail("a@c.com");
-        verify(studentRepository, never()).save(any());
     }
 
 }
