@@ -16,6 +16,7 @@ public class AdminStudentService {
     private final PasswordEncoder passwordEncoder;
 
     public Student getStudentById(String studentId) {
+
         return studentRepository.findById(studentId).orElseThrow();
     }
 
