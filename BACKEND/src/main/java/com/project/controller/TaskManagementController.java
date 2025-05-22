@@ -20,8 +20,8 @@ public class TaskManagementController {
 
     @GetMapping("/task")
     public ResponseEntity<List<Task>> getTasks(
-            @RequestHeader("X-User-Id") String userId,
-            @RequestHeader("X-User-Role") String role,
+    		@RequestAttribute("id") String userId,
+    		@RequestAttribute("role") String role,
             @RequestParam(defaultValue = "0") int offset,
             @RequestParam(defaultValue = "10") int limit) {
 
@@ -32,8 +32,8 @@ public class TaskManagementController {
     @GetMapping("/task/{taskId}")
     public ResponseEntity<Task> getTaskById(
             @PathVariable String taskId,
-            @RequestHeader("X-User-Id") String userId,
-            @RequestHeader("X-User-Role") String role) {
+            @RequestAttribute("id") String userId,
+            @RequestAttribute("role") String role) {
 
         Task task = taskService.getTaskById(taskId, userId, role);
         return ResponseEntity.ok(task);
@@ -43,8 +43,8 @@ public class TaskManagementController {
     public ResponseEntity<Task> createTask(
             @RequestBody Task task,
             @PathVariable String projectId,
-            @RequestHeader("X-User-Id") String userId,
-            @RequestHeader("X-User-Role") String role) {
+            @RequestAttribute("id") String userId,
+            @RequestAttribute("role") String role) {
 
         Task createdTask = taskService.createTask(task, projectId, userId, role);
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -56,8 +56,8 @@ public class TaskManagementController {
     public ResponseEntity<Task> updateTask(
             @PathVariable String taskId,
             @RequestBody Task updatedTask,
-            @RequestHeader("X-User-Id") String userId,
-            @RequestHeader("X-User-Role") String role) {
+            @RequestAttribute("id") String userId,
+            @RequestAttribute("role") String role) {
 
         Task task = taskService.updateTask(taskId, updatedTask, userId, role);
         return ResponseEntity.ok()
@@ -68,8 +68,8 @@ public class TaskManagementController {
     @DeleteMapping("/task/{taskId}")
     public ResponseEntity<Void> deleteTask(
             @PathVariable String taskId,
-            @RequestHeader("X-User-Id") String userId,
-            @RequestHeader("X-User-Role") String role) {
+            @RequestAttribute("id") String userId,
+            @RequestAttribute("role") String role) {
 
         taskService.deleteTask(taskId, userId, role);
         return ResponseEntity.noContent().build();

@@ -25,7 +25,7 @@ services:
     volumes:
       - mongo-dev-data:/data/db
     ports:
-      - "5005:27017"
+      - "27017:27017"
 
   mongoexpress:
     image: mongo-express:latest
