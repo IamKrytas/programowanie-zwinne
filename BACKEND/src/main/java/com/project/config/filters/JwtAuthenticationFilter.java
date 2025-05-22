@@ -36,23 +36,32 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             log.info("Checking if user request contains a Bearer token in Authorization header.");
             if (authHeader != null && authHeader.startsWith("Bearer ")) {
-                String token = authHeader.substring(7); // skip "Bearer "
+                String token = authHeader.substring(7);
                 var tokenDetails = jwtService.validateToken(token);
 
                 if (tokenDetails.getType().equals(JwtTokenType.ACCESS)) {
-                    String username = tokenDetails.getUserEmail();
-                    GrantedAuthority authority = new SimpleGrantedAuthority("ROLE_" + tokenDetails.getUserRole().name());
-                    UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(username, null, List.of(authority));
+                    String userEmail = tokenDetails.getUserEmail();
+                    String userRole = tokenDetails.getUserRole().name();
+
+                    GrantedAuthority authority = new SimpleGrantedAuthority("ROLE_" + userRole);
+                    var auth = new UsernamePasswordAuthenticationToken(userEmail, null, List.of(authority));
                     SecurityContextHolder.getContext().setAuthentication(auth);
-                    log.info("Request contains a valid Bearer token (subject:{}, role:{}).", username, tokenDetails.getUserRole());
+
+                    request.setAttribute("id", userEmail);
+                    request.setAttribute("role", userRole);
+
+                    log.info("Valid token (email: {}, role: {}).", userEmail, userRole);
                 } else {
-                    log.warn("Token is not of type ACCESS, assuming user is anonymous.");
+                    log.warn("Token is not of type ACCESS.");
                 }
             } else {
-                log.info("No Bearer token found in Authorization header, assuming user is anonymous.");
+                log.info("No Bearer token found.");
             }
-        } catch (Exception ignored) {}
+        } catch (Exception e) {
+            log.error("Error while processing JWT: {}", e.getMessage());
+        }
 
         filterChain.doFilter(request, response);
     }
 }
+
