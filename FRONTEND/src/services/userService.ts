@@ -67,3 +67,20 @@ export const refreshTokenService = async (): Promise<string> => {
   decodeAccessToken(accessToken);
   return data;
 }
+
+export const logoutUserService = async (): Promise<void> => {
+  try {
+    sessionStorage.removeItem("token");
+    sessionStorage.removeItem("refreshToken");
+    sessionStorage.removeItem("refreshSub");
+    sessionStorage.removeItem("refreshRole");
+    sessionStorage.removeItem("refreshExp");
+    sessionStorage.removeItem("accessSub");
+    sessionStorage.removeItem("accessRole");
+    sessionStorage.removeItem("accessExp");
+  }
+  catch (error) {
+    console.error("Błąd podczas wylogowywania:", error);
+  }
+  window.location.reload();
+}

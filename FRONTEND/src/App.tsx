@@ -2,25 +2,42 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import HomeView from './views/HomeView';
 import LoginView from './views/LoginView';
 import RegisterView from './views/RegisterView';
+import HomePageView from './views/HomePageView';
+import Navbar from './components/Navbar';
+import AdminPanelView from './views/AdminPanelView';
+// import Footer from './components/Footer';
 
-// import Navbar from './components/Navbar'
-// import Footer from './components/Footer'
 
 function App() {
+    const token = sessionStorage.getItem("token");
+    const role = sessionStorage.getItem("accessRole");
+    const isAdmin = role === "ADMIN";
+
     return (
-        <>
-            <Router>
-                {/* <Navbar /> */}
-                <Routes>
-                <Route path="/" element={<HomeView />} />
-                <Route path="/logowanie" element={<LoginView />} />
-                <Route path='/rejestracja' element={<RegisterView />} />
-                <Route path="*" element={<Navigate to="/" />} />
-                </Routes>
-                {/* <Footer /> */}
-            </Router>
-        </>
-    )
+        <Router>
+            {token && <Navbar />}
+            <Routes>
+                {/* Publiczne trasy */}
+                {!token ? (
+                    <>
+                        <Route path="/" element={<HomeView />} />
+                        <Route path="/logowanie" element={<LoginView />} />
+                        <Route path="/rejestracja" element={<RegisterView />} />
+                        <Route path="*" element={<Navigate to="/" />} />
+                    </>
+                ) : (
+                    <>
+                        <Route path="/home" element={<HomePageView />} />
+                        <Route path="*" element={<Navigate to="/home" />} />
+                        {isAdmin && (
+                            <Route path="/admin" element={<AdminPanelView />} />
+                        )}
+
+                    </>
+                )}
+            </Routes>
+        </Router>
+    );
 }
 
-export default App
+export default App;
