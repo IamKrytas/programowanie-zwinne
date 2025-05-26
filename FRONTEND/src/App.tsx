@@ -5,11 +5,12 @@ import RegisterView from './views/RegisterView';
 import HomePageView from './views/HomePageView';
 import Navbar from './components/Navbar';
 import AdminPanelView from './views/AdminPanelView';
+import ChatView from "./views/ChatView.tsx";
 // import Footer from './components/Footer';
 
 
 function App() {
-    const token = sessionStorage.getItem("token");
+    const token = sessionStorage.getItem("accessToken");
     const role = sessionStorage.getItem("accessRole");
     const isAdmin = role === "ADMIN";
 
@@ -28,6 +29,7 @@ function App() {
                 ) : (
                     <>
                         <Route path="/home" element={<HomePageView />} />
+                        <Route path="/chat" element={<ChatView />} />
                         <Route path="*" element={<Navigate to="/home" />} />
                         {isAdmin && (
                             <Route path="/admin" element={<AdminPanelView />} />
