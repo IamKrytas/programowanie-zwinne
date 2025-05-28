@@ -36,11 +36,11 @@ export const loginUserService = async (userData: User): Promise<string> => {
   }
 
   const data = await response.json();
-  const accessToken = data.token;
+  const accessToken = data.accessToken;
   const refreshToken = data.refreshToken
   decodeAccessToken(accessToken);
   decodeRefreshToken(refreshToken);
-  sessionStorage.setItem("token", accessToken);
+  sessionStorage.setItem("accessToken", accessToken);
   sessionStorage.setItem("refreshToken", refreshToken);
   return data;
 }
@@ -62,15 +62,15 @@ export const refreshTokenService = async (): Promise<string> => {
   }
 
   const data = await response.json();
-  const accessToken = data.token;
-  sessionStorage.setItem("token", accessToken);
+  const accessToken = data.accessToken;
+  sessionStorage.setItem("accessToken", accessToken);
   decodeAccessToken(accessToken);
   return data;
 }
 
 export const logoutUserService = async (): Promise<void> => {
   try {
-    sessionStorage.removeItem("token");
+    sessionStorage.removeItem("accessToken");
     sessionStorage.removeItem("refreshToken");
     sessionStorage.removeItem("refreshSub");
     sessionStorage.removeItem("refreshRole");
