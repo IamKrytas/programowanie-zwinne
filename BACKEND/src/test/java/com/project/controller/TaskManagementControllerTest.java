@@ -74,7 +74,7 @@ public class TaskManagementControllerTest {
         task.setTeacherId("1");
         task.setCreationDate(LocalDateTime.of(2023, 1, 1, 10, 0));
         task.setDoneDate(LocalDateTime.of(2023, 1, 2, 10, 0));
-        task.setFileId(Set.of(1));
+        task.setFileId(Set.of("1"));
         task.setProjectId("1");
 
         Project project = new Project();

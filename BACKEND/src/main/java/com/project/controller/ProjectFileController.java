@@ -25,7 +25,6 @@ public class ProjectFileController {
     private final ProjectFileService projectFileService;
 
     @GetMapping("/project/{projectId}/file/{fileId}")
-    @SneakyThrows({IOException.class})
     public ResponseEntity<InputStreamResource> getProjectFile(@PathVariable String projectId, @PathVariable String fileId) {
         InputStream stream = projectFileService.getProjectFile(projectId, fileId);
         InputStreamResource resource = new InputStreamResource(stream);
@@ -52,7 +51,6 @@ public class ProjectFileController {
     }
 
     @GetMapping("/project/{taskId}/file/{fileId}")
-    @SneakyThrows({IOException.class})
     public ResponseEntity<InputStreamResource> getTaskFile(@PathVariable String taskId, @PathVariable String fileId) {
         InputStream stream = projectFileService.getTaskFile(taskId, fileId);
         InputStreamResource resource = new InputStreamResource(stream);
