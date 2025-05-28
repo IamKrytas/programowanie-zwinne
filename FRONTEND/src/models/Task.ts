@@ -1,6 +1,6 @@
 export interface Task {
-    id: number;
-    fileId: number[];
+    id: string;
+    fileId: string[];
     studentId: number;
     projectId: number;
     name: string;

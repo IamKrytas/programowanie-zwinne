@@ -1,10 +1,10 @@
 import {Task} from "./Task.ts";
 
 export interface Project {
-    id: number;
-    fileId: number[];
-    studentId: number[];
-    teacherId: number;
+    id: string;
+    fileId: string[];
+    studentId: string[];
+    teacherId: string;
     tasks: Task[];
     students: number[];
     name: string;
