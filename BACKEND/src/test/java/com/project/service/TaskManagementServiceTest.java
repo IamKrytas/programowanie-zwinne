@@ -33,8 +33,7 @@ class TaskManagementServiceTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        sampleTask = new Task("task1", Set.of("1"), "2", "Task Name", "Description", 5,
-        	    LocalDateTime.now(), LocalDateTime.now(), "NEW", "1");
+        sampleTask = new Task("task1", "1", "1", Set.of(""), "2", "task1", "Description", 1, LocalDateTime.now(), LocalDateTime.now());
         sampleProject = new Project();
         sampleProject.setId("proj1");
         sampleProject.setTeacherId("1");
