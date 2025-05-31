@@ -60,7 +60,7 @@ public class ProjectFileService {
     }
 
     public Task deleteTaskFile(String taskId, String fileId){
-        String fileName = "project_%s_%s".formatted(taskId, fileId);
+        String fileName = "task_%s_%s".formatted(taskId, fileId);
         fileStorageService.deleteFile(fileName);
         Task task = taskRepository.findById(taskId).orElseThrow();
         Set<String> fileSet = task.getFileId();

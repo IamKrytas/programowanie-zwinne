@@ -50,7 +50,7 @@ public class ProjectFileController {
         return ResponseEntity.ok(project);
     }
 
-    @GetMapping("/project/{taskId}/file/{fileId}")
+    @GetMapping("/task/{taskId}/file/{fileId}")
     public ResponseEntity<InputStreamResource> getTaskFile(@PathVariable String taskId, @PathVariable String fileId) {
         InputStream stream = projectFileService.getTaskFile(taskId, fileId);
         InputStreamResource resource = new InputStreamResource(stream);
@@ -59,7 +59,7 @@ public class ProjectFileController {
                 .body(resource);
     }
 
-    @PostMapping("/project/{taskId}/file")
+    @PostMapping("/task/{taskId}/file")
     @SneakyThrows
     public ResponseEntity<Task> uploadTaskFile(@RequestParam("file") MultipartFile file, @PathVariable String taskId) {
         String filename = file.getOriginalFilename();
@@ -68,7 +68,7 @@ public class ProjectFileController {
         return ResponseEntity.ok(task);
     }
 
-    @DeleteMapping("/project/{taskId}/file/{fileId}")
+    @DeleteMapping("/task/{taskId}/file/{fileId}")
     @SneakyThrows
     public ResponseEntity<Task> deleteTaskFile(@PathVariable String taskId, @PathVariable String fileId) {
         Task task = projectFileService.deleteTaskFile(taskId, fileId);
