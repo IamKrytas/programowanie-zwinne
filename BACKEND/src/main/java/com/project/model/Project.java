@@ -19,13 +19,12 @@ import java.util.Set;
 @AllArgsConstructor
 @Document(collection = "project")
 public class Project {
-
     @Id
     private String id;
 
-    @NotEmpty(message = "fileId cannot be empty")
-    @Field(name = "fileId")
-    private Set<String> fileId;
+    @NotEmpty(message = "fileIds cannot be empty")
+    @Field(name = "fileIds")
+    private Set<String> fileIds;
 
     @NotBlank(message = "teacherId cannot be blank")
     @Field(name = "teacherId")
@@ -37,11 +36,7 @@ public class Project {
 
     @NotEmpty(message = "students cannot be empty")
     @Field(name = "students")
-    private Set<String> students;
-
-    @NotEmpty(message = "assignedStudents cannot be empty")
-    @Field(name = "assignedStudents")
-    private Set<String> assignedStudents;
+    private Set<String> studentIds;
 
     @NotBlank
     @Size(min = 2, max = 50, message = "Name should have at least {min} and maximum of {max} characters.")

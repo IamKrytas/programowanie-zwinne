@@ -15,7 +15,6 @@ import org.springframework.data.mongodb.core.mapping.Field;
 @AllArgsConstructor
 @Document(collection = "teacher")
 public class Teacher {
-
     @Id
     private String id;
 
@@ -38,5 +37,4 @@ public class Teacher {
     @Size(min = 18, max = 50, message = "Password should have at least {min}.")
     @Field(name = "password")
     private String password;
-
 }

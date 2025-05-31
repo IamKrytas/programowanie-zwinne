@@ -32,8 +32,8 @@ public class TaskManagementService {
                     .skip(offset).limit(limit)
                     .collect(Collectors.toList());
         } else if ("STUDENT".equalsIgnoreCase(role)) {
-            return projectRepository.findByStudentsContaining(userId, pageable).stream()
-                    .flatMap(p -> p.getTasks().stream().filter(t -> String.valueOf(t.getStudentId()).equals(userId)))
+            return projectRepository.findByStudentIdsContaining(userId, pageable).stream()
+                    .flatMap(p -> p.getTasks().stream().filter(t -> String.valueOf(t.getAssignedStudentId()).equals(userId)))
                     .skip(offset).limit(limit)
                     .collect(Collectors.toList());
         } else {
@@ -67,7 +67,7 @@ public class TaskManagementService {
             return task;
         }
 
-        if ("STUDENT".equalsIgnoreCase(role) && String.valueOf(task.getStudentId()).equals(userId)) {
+        if ("STUDENT".equalsIgnoreCase(role) && String.valueOf(task.getAssignedStudentId()).equals(userId)) {
             return task;
         }
 
@@ -88,9 +88,6 @@ public class TaskManagementService {
                 log.warn("User: {} not authorized to create task in project: {}", userId, projectId);
                 throw new SecurityException("Unauthorized to create task for this project");
             }
-
-            task.setProjectId(projectId);
-            task.setTeacherId(userId);
 
             Task saved = taskRepository.save(task);
             log.info("Task created successfully with ID: {} in project: {}", saved.getId(), projectId);

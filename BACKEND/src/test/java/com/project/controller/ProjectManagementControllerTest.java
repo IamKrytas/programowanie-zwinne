@@ -2,21 +2,15 @@ package com.project.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.model.Project;
-import com.project.model.Student;
 import com.project.service.ProjectManagementService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.web.servlet.MockMvc;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.List;
 import java.util.Set;
@@ -45,7 +39,7 @@ public class ProjectManagementControllerTest {
         sampleProject = new Project();
         sampleProject.setId("p1");
         sampleProject.setName("Test Project");
-        sampleProject.setStudents(Set.of("1"));
+        sampleProject.setStudentIds(Set.of("1"));
     }
 
     @Test

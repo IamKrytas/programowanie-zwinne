@@ -33,12 +33,11 @@ class TaskManagementServiceTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        sampleTask = new Task("task1", Set.of("1"), "2", "Task Name", "Description", 5,
-        	    LocalDateTime.now(), LocalDateTime.now(), "NEW", "1");
+        sampleTask = new Task("task1", "1", "1", Set.of(""), "2", "task1", "Description", 1, LocalDateTime.now(), LocalDateTime.now());
         sampleProject = new Project();
         sampleProject.setId("proj1");
         sampleProject.setTeacherId("1");
-        sampleProject.setStudents(Set.of("2"));
+        sampleProject.setStudentIds(Set.of("2"));
         sampleProject.setTasks(Set.of(sampleTask));
     }
 
@@ -52,10 +51,10 @@ class TaskManagementServiceTest {
 
     @Test
     void testGetTasksForStudent() {
-        when(projectRepository.findByStudentsContaining(eq("2"), any())).thenReturn(List.of(sampleProject));
+        when(projectRepository.findByStudentIdsContaining(eq("2"), any())).thenReturn(List.of(sampleProject));
         List<Task> tasks = taskService.getTasks("2", "STUDENT", 0, 10);
         assertEquals(1, tasks.size());
-        assertEquals("2", tasks.get(0).getStudentId());
+        assertEquals("2", tasks.get(0).getAssignedStudentId());
     }
 
     @Test

@@ -44,9 +44,9 @@ public class ProjectManagementServiceTest {
     public void testGetProjectByIdForStudentAuthorized() {
         Project project = new Project();
         project.setId("p1");
-        project.setStudents(Set.of("2"));
+        project.setStudentIds(Set.of("2"));
 
-        when(projectRepository.findByIdAndStudentsContaining("p1", "2")).thenReturn(Optional.of(project));
+        when(projectRepository.findByIdAndStudentIdsContaining("p1", "2")).thenReturn(Optional.of(project));
 
         Project result = projectService.getProjectById("p1", "2", "STUDENT");
         assertEquals("p1", result.getId());
@@ -56,7 +56,7 @@ public class ProjectManagementServiceTest {
     public void testCreateProject() {
         Project project = new Project();
         project.setName("New Project");
-        project.setStudents(Set.of("1"));
+        project.setStudentIds(Set.of("1"));
 
         when(projectRepository.save(any(Project.class))).thenAnswer(i -> i.getArgument(0));
 
@@ -73,7 +73,7 @@ public class ProjectManagementServiceTest {
 
         Project update = new Project();
         update.setName("Updated");
-        update.setStudents(Set.of());
+        update.setStudentIds(Set.of());
 
         when(projectRepository.findById("p1")).thenReturn(Optional.of(existing));
         when(projectRepository.save(any(Project.class))).thenAnswer(i -> i.getArgument(0));

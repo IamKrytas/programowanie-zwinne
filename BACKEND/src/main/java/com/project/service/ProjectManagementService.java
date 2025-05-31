@@ -25,7 +25,7 @@ public class ProjectManagementService {
         if ("TEACHER".equalsIgnoreCase(role)) {
             return projectRepository.findByTeacherId(userId, pageable);
         } else if ("STUDENT".equalsIgnoreCase(role)) {
-            return projectRepository.findByStudentsContaining(userId, pageable);
+            return projectRepository.findByStudentIdsContaining(userId, pageable);
         } else {
             log.warn("Unauthorized role '{}' tried to fetch projects", role);
             throw new SecurityException("Unauthorized role");
@@ -38,7 +38,7 @@ public class ProjectManagementService {
             return projectRepository.findByIdAndTeacherId(projectId, userId)
                     .orElseThrow(() -> new RuntimeException("Project not found or unauthorized"));
         } else if ("STUDENT".equalsIgnoreCase(role)) {
-            return projectRepository.findByIdAndStudentsContaining(projectId, userId)
+            return projectRepository.findByIdAndStudentIdsContaining(projectId, userId)
                     .orElseThrow(() -> new RuntimeException("Project not found or unauthorized"));
         } else {
             log.warn("Unauthorized role '{}' tried to access project", role);
