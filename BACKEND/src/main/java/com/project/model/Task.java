@@ -26,7 +26,7 @@ public class Task {
 
     @NotEmpty(message = "fileId cannot be empty")
     @Field(name = "fileId")
-    private Set<Integer> fileId;
+    private Set<String> fileId;
 
     @NotBlank
     @Field(name = "studentId")
