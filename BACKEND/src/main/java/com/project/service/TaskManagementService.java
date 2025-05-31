@@ -27,15 +27,9 @@ public class TaskManagementService {
         Pageable pageable = PageRequest.of(offset / limit, limit);
 
         if ("TEACHER".equalsIgnoreCase(role)) {
-            return projectRepository.findByTeacherId(userId, pageable).stream()
-                    .flatMap(p -> p.getTasks().stream())
-                    .skip(offset).limit(limit)
-                    .collect(Collectors.toList());
+            return taskRepository.findByTeacherId(userId, pageable).stream().toList();
         } else if ("STUDENT".equalsIgnoreCase(role)) {
-            return projectRepository.findByStudentIdsContaining(userId, pageable).stream()
-                    .flatMap(p -> p.getTasks().stream().filter(t -> String.valueOf(t.getAssignedStudentId()).equals(userId)))
-                    .skip(offset).limit(limit)
-                    .collect(Collectors.toList());
+            return taskRepository.findByAssignedStudentId(userId, pageable).stream().toList();
         } else {
             log.warn("Unauthorized role '{}' tried to fetch tasks", role);
             throw new SecurityException("Unauthorized role");
@@ -44,26 +38,9 @@ public class TaskManagementService {
 
     public Task getTaskById(String taskId, String userId, String role) {
         log.info("Fetching task with ID: {} by user: {} with role: {}", taskId, userId, role);
-        int userIntId = Integer.parseInt(userId);
+        Task task = taskRepository.findById(taskId).orElseThrow();
 
-        Optional<Project> project = projectRepository.findAll().stream()
-                .filter(p -> p.getTasks().stream().anyMatch(t -> t.getId().equals(taskId)))
-                .findFirst();
-
-        if (project.isEmpty()) {
-            log.warn("Task with ID: {} not found", taskId);
-            throw new RuntimeException("Task not found");
-        }
-
-        Task task = project.get().getTasks().stream()
-                .filter(t -> t.getId().equals(taskId))
-                .findFirst()
-                .orElseThrow(() -> {
-                    log.warn("Task with ID: {} not found in project", taskId);
-                    return new RuntimeException("Task not found");
-                });
-
-        if ("TEACHER".equalsIgnoreCase(role) && String.valueOf(project.get().getTeacherId()).equals(userId)) {
+        if ("TEACHER".equalsIgnoreCase(role) && String.valueOf(task.getTeacherId()).equals(userId)) {
             return task;
         }
 
@@ -100,15 +77,13 @@ public class TaskManagementService {
 
     public Task updateTask(String taskId, Task updatedTask, String userId, String role) {
         log.info("Updating task with ID: {} by user: {} with role: {}", taskId, userId, role);
-        int userIntId = Integer.parseInt(userId);
-
         Task existingTask = taskRepository.findById(taskId)
                 .orElseThrow(() -> {
                     log.warn("Task with ID: {} not found", taskId);
                     return new RuntimeException("Task not found");
                 });
 
-        if ("TEACHER".equalsIgnoreCase(role) && existingTask.getTeacherId().equals(String.valueOf(userIntId))) {
+        if ("TEACHER".equalsIgnoreCase(role) && existingTask.getTeacherId().equals(userId)) {
             existingTask.setName(updatedTask.getName());
             existingTask.setDescription(updatedTask.getDescription());
             existingTask.setPriority(updatedTask.getPriority());
@@ -126,15 +101,13 @@ public class TaskManagementService {
 
     public void deleteTask(String taskId, String userId, String role) {
         log.info("Attempting to delete task with ID: {} by user: {} with role: {}", taskId, userId, role);
-        int userIntId = Integer.parseInt(userId);
-
         Task task = taskRepository.findById(taskId)
                 .orElseThrow(() -> {
                     log.warn("Task with ID: {} not found", taskId);
                     return new RuntimeException("Task not found");
                 });
 
-        if ("TEACHER".equalsIgnoreCase(role) && task.getTeacherId().equals(String.valueOf(userIntId))) {
+        if ("TEACHER".equalsIgnoreCase(role) && task.getTeacherId().equals(userId)) {
             taskRepository.delete(task);
             log.info("Task with ID: {} deleted successfully by user: {}", taskId, userId);
         } else {

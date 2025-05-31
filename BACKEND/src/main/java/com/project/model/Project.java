@@ -32,7 +32,7 @@ public class Project {
 
     @NotEmpty(message = "tasks cannot be empty")
     @Field(name = "tasks")
-    private Set<Task> tasks;
+    private Set<String> taskIds;
 
     @NotEmpty(message = "students cannot be empty")
     @Field(name = "students")
