@@ -25,9 +25,9 @@ public class ProjectFileService {
         String fileName = "project_%s_%s".formatted(projectId, fileId);
         fileStorageService.saveFile(fileName, file);
         Project project = projectRepository.findById(projectId).orElseThrow();
-        Set<String> fileSet = project.getFileId();
+        Set<String> fileSet = project.getFileIds();
         fileSet.add(fileName);
-        project.setFileId(fileSet);
+        project.setFileIds(fileSet);
         projectRepository.save(project);
         return project;
     }
@@ -36,9 +36,9 @@ public class ProjectFileService {
         String fileName = "project_%s_%s".formatted(projectId, fileId);
         fileStorageService.deleteFile(fileName);
         Project project = projectRepository.findById(projectId).orElseThrow();
-        Set<String> fileSet = project.getFileId();
+        Set<String> fileSet = project.getFileIds();
         fileSet.remove(fileName);
-        project.setFileId(fileSet);
+        project.setFileIds(fileSet);
         projectRepository.save(project);
         return project;
     }
@@ -52,9 +52,9 @@ public class ProjectFileService {
         String fileName = "task_%s_%s".formatted(taskId, fileId);
         fileStorageService.saveFile(fileName, file);
         Task task = taskRepository.findById(taskId).orElseThrow();
-        Set<String> fileSet = task.getFileId();
+        Set<String> fileSet = task.getFileIds();
         fileSet.add(fileName);
-        task.setFileId(fileSet);
+        task.setFileIds(fileSet);
         taskRepository.save(task);
         return task;
     }
@@ -63,9 +63,9 @@ public class ProjectFileService {
         String fileName = "task_%s_%s".formatted(taskId, fileId);
         fileStorageService.deleteFile(fileName);
         Task task = taskRepository.findById(taskId).orElseThrow();
-        Set<String> fileSet = task.getFileId();
+        Set<String> fileSet = task.getFileIds();
         fileSet.remove(fileName);
-        task.setFileId(fileSet);
+        task.setFileIds(fileSet);
         taskRepository.save(task);
         return task;
     }

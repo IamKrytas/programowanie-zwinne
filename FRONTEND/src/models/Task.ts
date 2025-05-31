@@ -1,8 +1,9 @@
 export interface Task {
-    id: number;
-    fileId: number[];
-    studentId: number;
-    projectId: number;
+    id: string;
+    projectId: string;
+    teacherId: string;
+    fileIds: string[];
+    assignedStudentId: number;
     name: string;
     description: string;
     priority: number;

@@ -20,7 +20,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -31,7 +30,6 @@ import java.util.Set;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.hamcrest.Matchers.emptyOrNullString;
 import static org.hamcrest.MatcherAssert.assertThat; // (opcjonalny, przydatny w innych testach)
@@ -70,11 +68,11 @@ public class TaskManagementControllerTest {
         task.setName("Test Task");
         task.setDescription("Test Description");
         task.setPriority(5);
-        task.setStudentId("1");
+        task.setAssignedStudentId("1");
         task.setTeacherId("1");
         task.setCreationDate(LocalDateTime.of(2023, 1, 1, 10, 0));
         task.setDoneDate(LocalDateTime.of(2023, 1, 2, 10, 0));
-        task.setFileId(Set.of("1"));
+        task.setFileIds(Set.of("1"));
         task.setProjectId("1");
 
         Project project = new Project();

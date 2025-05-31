@@ -12,10 +12,10 @@ public interface ProjectRepository extends MongoRepository<Project, String> {
 
     List<Project> findByTeacherId(String teacherId, Pageable pageable);
 
-    List<Project> findByStudentsContaining(String studentId, Pageable pageable);
+    List<Project> findByStudentIdsContaining(String studentId, Pageable pageable);
     
     Optional<Project> findByIdAndTeacherId(String projectId, String teacherId);
 
-    Optional<Project> findByIdAndStudentsContaining(String projectId, String studentId);
+    Optional<Project> findByIdAndStudentIdsContaining(String projectId, String studentId);
 }
 

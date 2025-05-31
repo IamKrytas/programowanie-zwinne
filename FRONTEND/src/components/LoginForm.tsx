@@ -1,12 +1,12 @@
 // imports
 import { useState } from 'react';
 import { Button, Card, Col, Container, Form, Row } from 'react-bootstrap';
-import { User } from '../models/User';
+import { LoginCredentials } from '../models/auth/LoginCredentials.ts';
 import { loginUser } from '../controllers/userController';
 
 const LoginForm = () => {
 
-    const [formData, setFormData] = useState<User>({
+    const [formData, setFormData] = useState<LoginCredentials>({
         email: '',
         password: '',
     });

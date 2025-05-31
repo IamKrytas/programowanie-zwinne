@@ -24,13 +24,19 @@ public class Task {
     @Id
     private String id;
 
-    @NotEmpty(message = "fileId cannot be empty")
-    @Field(name = "fileId")
-    private Set<String> fileId;
+    @Field(name = "projectId")
+    private String projectId;
+
+    @Field(name = "teacherId")
+    private String teacherId;
+
+    @NotEmpty(message = "fileIds cannot be empty")
+    @Field(name = "fileIds")
+    private Set<String> fileIds;
 
     @NotBlank
-    @Field(name = "studentId")
-    private String studentId;
+    @Field(name = "assignedStudentId")
+    private String assignedStudentId;
 
     @NotBlank
     @Size(min = 2, max = 50, message = "Name should have at least {min} and maximum of {max} characters.")
@@ -53,10 +59,4 @@ public class Task {
     @NotNull
     @Field(name = "creationDate")
     private LocalDateTime creationDate;
-
-    @Field(name = "projectId")
-    private String projectId;
-
-    @Field(name = "teacherId")
-    private String teacherId;
 }

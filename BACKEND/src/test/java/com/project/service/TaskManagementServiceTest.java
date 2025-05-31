@@ -38,7 +38,7 @@ class TaskManagementServiceTest {
         sampleProject = new Project();
         sampleProject.setId("proj1");
         sampleProject.setTeacherId("1");
-        sampleProject.setStudents(Set.of("2"));
+        sampleProject.setStudentIds(Set.of("2"));
         sampleProject.setTasks(Set.of(sampleTask));
     }
 
@@ -52,10 +52,10 @@ class TaskManagementServiceTest {
 
     @Test
     void testGetTasksForStudent() {
-        when(projectRepository.findByStudentsContaining(eq("2"), any())).thenReturn(List.of(sampleProject));
+        when(projectRepository.findByStudentIdsContaining(eq("2"), any())).thenReturn(List.of(sampleProject));
         List<Task> tasks = taskService.getTasks("2", "STUDENT", 0, 10);
         assertEquals(1, tasks.size());
-        assertEquals("2", tasks.get(0).getStudentId());
+        assertEquals("2", tasks.get(0).getAssignedStudentId());
     }
 
     @Test

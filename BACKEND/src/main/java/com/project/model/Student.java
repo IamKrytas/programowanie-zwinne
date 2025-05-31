@@ -16,7 +16,6 @@ import jakarta.validation.constraints.NotNull;
 @AllArgsConstructor
 @Document(collection = "student")
 public class Student {
-
     @Id
     private String id;
 
@@ -42,5 +41,4 @@ public class Student {
     @Size(min = 8, max = 50, message = "Password should have at least {min}.")
     @Field(name = "password")
     private String password;
-
 }

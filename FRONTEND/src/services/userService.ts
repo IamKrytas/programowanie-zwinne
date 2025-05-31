@@ -1,6 +1,7 @@
 import { Student } from "../models/Student";
-import { User } from "../models/User";
+import { LoginCredentials } from "../models/auth/LoginCredentials.ts";
 import { decodeAccessToken, decodeRefreshToken } from "../utils/DecodeTokens";
+import JwtTokenPair from "../models/auth/JwtTokenPair.ts";
 
 // Register new user
 export const registerUserService = async (userData: Student): Promise<string> => {
@@ -21,7 +22,7 @@ export const registerUserService = async (userData: Student): Promise<string> =>
 }
 
 // Login existing user
-export const loginUserService = async (userData: User): Promise<string> => {
+export const loginUserService = async (userData: LoginCredentials): Promise<JwtTokenPair> => {
   const API_URL = "http://localhost:8080";
   const response = await fetch(`${API_URL}/api/v1/auth/login`, {
     method: "POST",
@@ -35,7 +36,7 @@ export const loginUserService = async (userData: User): Promise<string> => {
     throw new Error(`Błąd: ${response.status}`);
   }
 
-  const data = await response.json();
+  const data: JwtTokenPair = await response.json();
   const accessToken = data.accessToken;
   const refreshToken = data.refreshToken
   decodeAccessToken(accessToken);
