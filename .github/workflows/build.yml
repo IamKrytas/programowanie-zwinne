@@ -17,9 +17,26 @@ jobs:
             distribution: 'temurin'
             cache: gradle
       
+      - name: Set up Docker Compose
+        run: |
+          sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+          sudo chmod +x /usr/local/bin/docker-compose
+          docker-compose --version
+
       - name: Build with Gradle
         run: chmod a+x ./gradlew && ./gradlew clean build
         working-directory: ./BACKEND
+      
+      - name: Run unit tests
+        run: ./gradlew test
+        working-directory: ./BACKEND
+      
+      - name: Run integration test dependencies
+        run: docker-compose -f CONTRIB/docker/app-dependencies.yaml up -d
+
+      # - name: Run integration tests
+      #   run: ./gradlew integrationTest
+      #   working-directory: ./BACKEND
       
   build_frontend:
     name: Build frontend
