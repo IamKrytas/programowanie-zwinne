@@ -1,10 +1,8 @@
-import {Task} from "./Task.ts";
-
 export interface Project {
     id: string;
     fileIds: string[];
     teacherId: string;
-    tasks: Task[];
+    taskIds: string[];
     studentIds: string[];
     name: string;
     description: string;

@@ -38,7 +38,7 @@ dependencies {
 	annotationProcessor 'org.projectlombok:lombok:1.18.30'
 }
 
-configurations.all {
+configurations.configureEach {
     resolutionStrategy {
         force 'jakarta.validation:jakarta.validation-api:3.1.0'
         force 'jakarta.xml.bind:jakarta.xml.bind-api:4.0.0'
@@ -48,6 +48,28 @@ configurations.all {
     }
 }
 
-tasks.named('test') {
+sourceSets {
+	integrationTest {
+		java.srcDir file('src/integrationTest/java')
+		resources.srcDir file('src/integrationTest/resources')
+		compileClasspath += sourceSets.main.output + configurations.testRuntimeClasspath
+		runtimeClasspath += output + compileClasspath
+	}
+}
+
+configurations {
+	integrationTestImplementation.extendsFrom testImplementation
+	integrationTestRuntimeOnly.extendsFrom testRuntimeOnly
+}
+
+tasks.register('integrationTest', Test) {
+	description = 'Runs the integration tests.'
+	group = 'verification'
+	testClassesDirs = sourceSets.integrationTest.output.classesDirs
+	classpath = sourceSets.integrationTest.runtimeClasspath
+	shouldRunAfter test
+}
+
+tasks.withType(Test).configureEach {
 	useJUnitPlatform()
 }

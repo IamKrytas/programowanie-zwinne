@@ -1,6 +1,8 @@
 package com.project.config.filters;
 
 import com.project.model.auth.JwtTokenType;
+import com.project.repository.StudentRepository;
+import com.project.repository.TeacherRepository;
 import com.project.service.JwtTokenService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -25,6 +27,8 @@ import java.util.List;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtTokenService jwtService;
+    private final StudentRepository studentRepository;
+    private final TeacherRepository teacherRepository;
 
     @Override
     @SneakyThrows({IOException.class, ServletException.class})
@@ -43,11 +47,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     String userEmail = tokenDetails.getUserEmail();
                     String userRole = tokenDetails.getUserRole().name();
 
+                    String userId = switch (userRole) {
+                        case "STUDENT" -> studentRepository.findByEmail(userEmail)
+                                .orElseThrow(() -> new RuntimeException("Student not found")).getId();
+                        case "TEACHER" -> teacherRepository.findByEmail(userEmail)
+                                .orElseThrow(() -> new RuntimeException("Teacher not found")).getId();
+                        default -> userEmail;
+                    };
+
                     GrantedAuthority authority = new SimpleGrantedAuthority("ROLE_" + userRole);
                     var auth = new UsernamePasswordAuthenticationToken(userEmail, null, List.of(authority));
                     SecurityContextHolder.getContext().setAuthentication(auth);
 
-                    request.setAttribute("id", userEmail);
+                    request.setAttribute("id", userId);
                     request.setAttribute("role", userRole);
 
                     log.info("Valid token (email: {}, role: {}).", userEmail, userRole);

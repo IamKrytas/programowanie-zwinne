@@ -27,31 +27,29 @@ class TaskManagementServiceTest {
     @InjectMocks
     private TaskManagementService taskService;
 
-    private Task sampleTask;
     private Project sampleProject;
+    private Task sampleTask;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        sampleTask = new Task("task1", "1", "1", Set.of(""), "2", "task1", "Description", 1, LocalDateTime.now(), LocalDateTime.now());
-        sampleProject = new Project();
-        sampleProject.setId("proj1");
-        sampleProject.setTeacherId("1");
-        sampleProject.setStudentIds(Set.of("2"));
-        sampleProject.setTasks(Set.of(sampleTask));
+
+        sampleProject = new Project("proj1", Set.of(), "teach1", Set.of("task1"), Set.of("stu1"), "name", "desc", LocalDateTime.now(), LocalDateTime.now());
+        sampleTask = new Task("task1", "proj1", "teach1", Set.of(""), "2", "task1", "Description", 1, LocalDateTime.now(), LocalDateTime.now());
     }
 
     @Test
     void testGetTasksForTeacher() {
-        when(projectRepository.findByTeacherId(eq("1"), any())).thenReturn(List.of(sampleProject));
-        List<Task> tasks = taskService.getTasks("1", "TEACHER", 0, 10);
+        when(taskRepository.findByTeacherId(any(), any())).thenReturn(List.of(sampleTask));
+        List<Task> tasks = taskService.getTasks("teach1", "TEACHER", 0, 10);
+
         assertEquals(1, tasks.size());
         assertEquals("task1", tasks.get(0).getId());
     }
 
     @Test
     void testGetTasksForStudent() {
-        when(projectRepository.findByStudentIdsContaining(eq("2"), any())).thenReturn(List.of(sampleProject));
+        when(taskRepository.findByAssignedStudentId(any(), any())).thenReturn(List.of(sampleTask));
         List<Task> tasks = taskService.getTasks("2", "STUDENT", 0, 10);
         assertEquals(1, tasks.size());
         assertEquals("2", tasks.get(0).getAssignedStudentId());
@@ -59,24 +57,25 @@ class TaskManagementServiceTest {
 
     @Test
     void testGetTaskByIdAuthorizedTeacher() {
-        when(projectRepository.findAll()).thenReturn(List.of(sampleProject));
-        Task result = taskService.getTaskById("task1", "1", "TEACHER");
+        when(taskRepository.findById(eq("task1"))).thenReturn(Optional.of(sampleTask));
+        Task result = taskService.getTaskById("task1", "teach1", "TEACHER");
         assertNotNull(result);
     }
 
     @Test
     void testGetTaskByIdAuthorizedStudent() {
-        when(projectRepository.findAll()).thenReturn(List.of(sampleProject));
+        when(taskRepository.findById(eq("task1"))).thenReturn(Optional.of(sampleTask));
         Task result = taskService.getTaskById("task1", "2", "STUDENT");
         assertNotNull(result);
     }
 
     @Test
     void testCreateTask() {
-        when(projectRepository.findById("proj1")).thenReturn(Optional.of(sampleProject));
+        when(projectRepository.findById(eq("proj1"))).thenReturn(Optional.of(sampleProject));
+        when(taskRepository.findById(eq("task1"))).thenReturn(Optional.of(sampleTask));
         when(taskRepository.save(any(Task.class))).thenReturn(sampleTask);
 
-        Task result = taskService.createTask(sampleTask, "proj1", "1", "TEACHER");
+        Task result = taskService.createTask(sampleTask, "proj1", "teach1", "TEACHER");
         assertEquals("task1", result.getId());
     }
 
@@ -86,7 +85,7 @@ class TaskManagementServiceTest {
         when(taskRepository.save(any(Task.class))).thenReturn(sampleTask);
 
         sampleTask.setName("Updated Name");
-        Task result = taskService.updateTask("task1", sampleTask, "1", "TEACHER");
+        Task result = taskService.updateTask("task1", sampleTask, "teach1", "TEACHER");
         assertEquals("Updated Name", result.getName());
     }
 
@@ -94,7 +93,6 @@ class TaskManagementServiceTest {
     void testDeleteTask() {
         when(taskRepository.findById("task1")).thenReturn(Optional.of(sampleTask));
         doNothing().when(taskRepository).deleteById("task1");
-
-        assertDoesNotThrow(() -> taskService.deleteTask("task1", "1", "TEACHER"));
+        assertDoesNotThrow(() -> taskService.deleteTask("task1", "teach1", "TEACHER"));
     }
 } 

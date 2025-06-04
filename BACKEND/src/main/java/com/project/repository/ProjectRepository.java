@@ -9,13 +9,10 @@ import java.util.Optional;
 
 
 public interface ProjectRepository extends MongoRepository<Project, String> {
-
+    List<Project> findByTeacherId(String teacherId);
     List<Project> findByTeacherId(String teacherId, Pageable pageable);
-
     List<Project> findByStudentIdsContaining(String studentId, Pageable pageable);
-    
     Optional<Project> findByIdAndTeacherId(String projectId, String teacherId);
-
     Optional<Project> findByIdAndStudentIdsContaining(String projectId, String studentId);
 }
 
