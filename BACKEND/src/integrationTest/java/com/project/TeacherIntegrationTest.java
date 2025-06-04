@@ -23,7 +23,7 @@ class TeacherIntegrationTest {
     private @Autowired TestRestTemplate restTemplate;
     private @Autowired StartupConfig startupConfig;
 
-    private final LoginCredentials teacherCredentials = new LoginCredentials("teacher@test.com", "teacher1234");
+    private final LoginCredentials teacherCredentials = new LoginCredentials("teacher@test.com", "test1234");
 
     @BeforeEach
     public void setUp() {

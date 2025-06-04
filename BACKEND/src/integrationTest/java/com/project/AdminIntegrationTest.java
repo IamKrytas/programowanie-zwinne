@@ -2,6 +2,7 @@ package com.project;
 
 import com.project.config.StartupConfig;
 import com.project.model.Project;
+import com.project.model.Student;
 import com.project.model.auth.JwtTokenPair;
 import com.project.model.auth.LoginCredentials;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,7 +24,7 @@ class AdminIntegrationTest {
     private @Autowired TestRestTemplate restTemplate;
     private @Autowired StartupConfig startupConfig;
 
-    private final LoginCredentials adminCredentials = new LoginCredentials("admin@test.com", "admin1234");
+    private final LoginCredentials adminCredentials = new LoginCredentials("admin@example.com", "admin");
 
     @BeforeEach
     public void setUp() {
@@ -49,15 +50,15 @@ class AdminIntegrationTest {
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<Void> requestEntity = new HttpEntity<>(headers);
 
-        String projectsUrl = "http://localhost:%d/api/v1/project".formatted(port);
-        ResponseEntity<List<Project>> projectsResponse = restTemplate.exchange(
-            projectsUrl,
+        String studentsUrl = "http://localhost:%d/api/v1/admin/student".formatted(port);
+        ResponseEntity<List<Student>> studentsResponse = restTemplate.exchange(
+            studentsUrl,
             HttpMethod.GET,
             requestEntity,
             new ParameterizedTypeReference<>() {}
         );
 
-        assertThat(projectsResponse.getStatusCode().is2xxSuccessful()).isTrue();
-        assertThat(projectsResponse.getBody()).isNotEmpty();
+        assertThat(studentsResponse.getStatusCode().is2xxSuccessful()).isTrue();
+        assertThat(studentsResponse.getBody()).isNotEmpty();
     }
 }
