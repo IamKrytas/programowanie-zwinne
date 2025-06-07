@@ -10,9 +10,9 @@ const NavigationBar = () => {
         <Navbar.Toggle aria-controls="project-navbar-nav" />
         <Navbar.Collapse id="project-navbar-nav">
           <Nav className="ms-auto">
-            <Nav.Link href="#projekty">Projekty</Nav.Link>
+            <Nav.Link as={Link} to="/projects">Projekty</Nav.Link>
+            <Nav.Link as={Link} to="/tasks">Zadania</Nav.Link>
             <Nav.Link href="#uczestnicy">Uczestnicy</Nav.Link>
-            <Nav.Link href="#zadania">Zadania</Nav.Link>
             <Nav.Link href="#profil">Profil</Nav.Link>
             <Nav.Link as={Link} to="/chat">Chat</Nav.Link>
             <Nav.Link onClick={logoutUserService}>
