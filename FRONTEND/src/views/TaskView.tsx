@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getAllTasks, getTaskById, createTask, modifyTask, deleteTask } from '../controllers/taskController';
+import { getAllTasks, createTask, modifyTask, deleteTask } from '../controllers/taskController';
 import { Table, Button, Modal, Form } from 'react-bootstrap';
 import { Task } from '../models/Task';
 
@@ -35,7 +35,7 @@ function TaskView() {
     const handleGetTasks = async () => {
         try {
             const response = await getAllTasks();
-            setTasks(response.data);
+            setTasks(response);
         } catch (error) {
             console.error("Error fetching tasks:", error);
         }
@@ -56,8 +56,8 @@ function TaskView() {
         setForm({
             ...task,
             fileIds: task.fileIds.join(','),
-            creationDate: task.creationDate.slice(0, 10),
-            doneDate: task.doneDate.slice(0, 10)
+            creationDate: task.creationDate ? new Date(task.creationDate).toISOString().slice(0, 10) : '',
+            doneDate: task.doneDate ? new Date(task.doneDate).toISOString().slice(0, 10) : '',
         });
         setShowModal(true);
     };

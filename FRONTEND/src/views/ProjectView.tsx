@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getAllProjects, getProjectById, createProject, modifyProject, deleteProject } from '../controllers/projectController';
+import { getAllProjects, createProject, modifyProject, deleteProject } from '../controllers/projectController';
 import { Table, Button, Modal, Form } from 'react-bootstrap';
 import { Project } from '../models/Project';
 
@@ -36,7 +36,7 @@ function ProjectView() {
     const handleGetProjects = async () => {
         try {
             const response = await getAllProjects();
-            setProjects(response.data);
+            setProjects(response);
         } catch (error) {
             console.error("Error fetching projects:", error);
         }
@@ -59,8 +59,8 @@ function ProjectView() {
             fileIds: project.fileIds.join(', '),
             studentIds: project.studentIds.join(', '),
             taskIds: project.taskIds.join(', '),
-            creationDate: new Date(project.creationDate).toISOString().slice(0, 10),
-            doneDate: new Date(project.doneDate).toISOString().slice(0, 10),
+            creationDate: project.creationDate ? new Date(project.creationDate).toISOString().slice(0, 10) : '',
+            doneDate: project.doneDate ? new Date(project.doneDate).toISOString().slice(0, 10) : '',
         });
         setShowModal(true);
     };
@@ -81,11 +81,11 @@ function ProjectView() {
     const handleSave = async () => {
         const payload: Project = {
             ...form,
-            fileIds: form.fileIds.split(',').map((id) => id.trim()),
-            studentIds: form.studentIds.split(',').map((id) => id.trim()),
-            taskIds: form.taskIds.split(',').map((id) => id.trim()),
-            creationDate: new Date(form.creationDate),
-            doneDate: new Date(form.doneDate),
+            fileIds: form.fileIds ? form.fileIds.split(',').map(id => id.trim()) : [],
+            studentIds: form.studentIds ? form.studentIds.split(',').map(id => id.trim()) : [],
+            taskIds: form.taskIds ? form.taskIds.split(',').map(id => id.trim()) : [],
+            creationDate: form.creationDate ? new Date(form.creationDate) : new Date(),
+            doneDate: form.doneDate ? new Date(form.doneDate) : new Date(),
         };
 
         try {
@@ -99,6 +99,13 @@ function ProjectView() {
         } catch (error) {
             console.error("Error saving project:", error);
         }
+    };
+
+    const handleInputChange = (field: string, value: string) => {
+        setForm(prev => ({
+            ...prev,
+            [field]: value
+        }));
     };
 
     return (
@@ -128,8 +135,8 @@ function ProjectView() {
                             <td>{project.studentIds.join(', ')}</td>
                             <td>{project.taskIds.join(', ')}</td>
                             <td>{project.fileIds.join(', ')}</td>
-                            <td>{new Date(project.creationDate).toISOString().slice(0, 10)}</td>
-                            <td>{new Date(project.doneDate).toISOString().slice(0, 10)}</td>
+                            <td>{project.creationDate ? new Date(project.creationDate).toISOString().slice(0, 10) : ''}</td>
+                            <td>{project.doneDate ? new Date(project.doneDate).toISOString().slice(0, 10) : ''}</td>
                             <td>
                                 <Button size="sm" onClick={() => handleEdit(project)} className="me-2">Edytuj</Button>
                                 <Button size="sm" variant="danger" onClick={() => handleDelete(project.id)}>Usuń</Button>
@@ -145,22 +152,60 @@ function ProjectView() {
                 </Modal.Header>
                 <Modal.Body>
                     <Form>
-                        {['name', 'description', 'teacherId', 'studentIds', 'fileIds', 'taskIds'].map(field => (
-                            <Form.Group key={field} className="mb-2">
-                                <Form.Label>{field}</Form.Label>
-                                <Form.Control
-                                    type="text"
-                                    value={form[field]}
-                                    onChange={(e) => setForm({ ...form, [field]: e.target.value })}
-                                />
-                            </Form.Group>
-                        ))}
+                        <Form.Group className="mb-2">
+                            <Form.Label>Nazwa</Form.Label>
+                            <Form.Control
+                                type="text"
+                                value={form.name}
+                                onChange={(e) => handleInputChange('name', e.target.value)}
+                            />
+                        </Form.Group>
+                        <Form.Group className="mb-2">
+                            <Form.Label>Opis</Form.Label>
+                            <Form.Control
+                                type="text"
+                                value={form.description}
+                                onChange={(e) => handleInputChange('description', e.target.value)}
+                            />
+                        </Form.Group>
+                        <Form.Group className="mb-2">
+                            <Form.Label>ID Nauczyciela</Form.Label>
+                            <Form.Control
+                                type="text"
+                                value={form.teacherId}
+                                onChange={(e) => handleInputChange('teacherId', e.target.value)}
+                            />
+                        </Form.Group>
+                        <Form.Group className="mb-2">
+                            <Form.Label>ID Studentów (oddzielone przecinkami)</Form.Label>
+                            <Form.Control
+                                type="text"
+                                value={form.studentIds}
+                                onChange={(e) => handleInputChange('studentIds', e.target.value)}
+                            />
+                        </Form.Group>
+                        <Form.Group className="mb-2">
+                            <Form.Label>ID Zadań (oddzielone przecinkami)</Form.Label>
+                            <Form.Control
+                                type="text"
+                                value={form.taskIds}
+                                onChange={(e) => handleInputChange('taskIds', e.target.value)}
+                            />
+                        </Form.Group>
+                        <Form.Group className="mb-2">
+                            <Form.Label>ID Plików (oddzielone przecinkami)</Form.Label>
+                            <Form.Control
+                                type="text"
+                                value={form.fileIds}
+                                onChange={(e) => handleInputChange('fileIds', e.target.value)}
+                            />
+                        </Form.Group>
                         <Form.Group className="mb-2">
                             <Form.Label>Data Utworzenia</Form.Label>
                             <Form.Control
                                 type="date"
                                 value={form.creationDate}
-                                onChange={(e) => setForm({ ...form, creationDate: e.target.value })}
+                                onChange={(e) => handleInputChange('creationDate', e.target.value)}
                             />
                         </Form.Group>
                         <Form.Group className="mb-2">
@@ -168,7 +213,7 @@ function ProjectView() {
                             <Form.Control
                                 type="date"
                                 value={form.doneDate}
-                                onChange={(e) => setForm({ ...form, doneDate: e.target.value })}
+                                onChange={(e) => handleInputChange('doneDate', e.target.value)}
                             />
                         </Form.Group>
                     </Form>
