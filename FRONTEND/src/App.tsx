@@ -8,6 +8,7 @@ import AdminPanelView from './views/AdminPanelView';
 import ChatView from "./views/ChatView.tsx";
 import ProjectView from './views/ProjectView.tsx';
 import TaskView from './views/TaskView.tsx';
+import ProjectByIdView from './views/ProjectByIdView.tsx';
 // import Footer from './components/Footer';
 
 
@@ -32,6 +33,7 @@ function App() {
                     <>
                         <Route path="/home" element={<HomePageView />} />
                         <Route path="/projects" element={<ProjectView />} />
+                        <Route path="/project/:id" element={<ProjectByIdView />} />
                         <Route path="/tasks" element={<TaskView />} />
                         <Route path="/chat" element={<ChatView />} />
                         <Route path="*" element={<Navigate to="/home" />} />
