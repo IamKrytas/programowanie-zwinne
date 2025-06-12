@@ -2,11 +2,14 @@ import { useState, useEffect } from 'react';
 import { getAllProjects, createProject, modifyProject, deleteProject } from '../controllers/projectController';
 import { Table, Button, Modal, Form } from 'react-bootstrap';
 import { Project } from '../models/Project';
+import { useNavigate } from 'react-router-dom';
 
 function ProjectView() {
     const [projects, setProjects] = useState<Project[]>([]);
     const [showModal, setShowModal] = useState(false);
     const [editingProject, setEditingProject] = useState<Project | null>(null);
+
+    const navigate = useNavigate();
 
     const emptyProject: Project = {
         id: '',
@@ -81,9 +84,9 @@ function ProjectView() {
     const handleSave = async () => {
         const payload: Project = {
             ...form,
-            fileIds: form.fileIds ? form.fileIds.split(',').map(id => id.trim()) : [],
-            studentIds: form.studentIds ? form.studentIds.split(',').map(id => id.trim()) : [],
-            taskIds: form.taskIds ? form.taskIds.split(',').map(id => id.trim()) : [],
+            fileIds: (form.fileIds ?? []).split(','),
+            studentIds: (form.studentIds ?? []).split(','),
+            taskIds: (form.taskIds ?? []).split(','),
             creationDate: form.creationDate ? new Date(form.creationDate) : new Date(),
             doneDate: form.doneDate ? new Date(form.doneDate) : new Date(),
         };
@@ -139,6 +142,7 @@ function ProjectView() {
                             <td>{project.doneDate ? new Date(project.doneDate).toISOString().slice(0, 10) : ''}</td>
                             <td>
                                 <Button size="sm" onClick={() => handleEdit(project)} className="me-2">Edytuj</Button>
+                                <Button size="sm" variant="warning" onClick={() => navigate(`/project/${project.id}`)} className="me-2">Zobacz</Button>
                                 <Button size="sm" variant="danger" onClick={() => handleDelete(project.id)}>Usuń</Button>
                             </td>
                         </tr>
