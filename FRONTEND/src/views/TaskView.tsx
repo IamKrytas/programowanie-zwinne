@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { getAllTasks, createTask, modifyTask, deleteTask } from '../controllers/taskController';
-import { Table, Button, Modal, Form } from 'react-bootstrap';
+import { Table, Button, Modal, Form, Container } from 'react-bootstrap';
 import { Task } from '../models/Task';
 
 function TaskView() {
@@ -97,7 +97,7 @@ function TaskView() {
     };
 
     return (
-        <div className="container mt-4">
+        <Container className="mt-4">
             <h2>Zarządzanie Zadaniami</h2>
             <Button variant="primary" onClick={handleCreate} className="mb-3">Dodaj Zadanie</Button>
             <Table responsive>
@@ -194,7 +194,7 @@ function TaskView() {
                     <Button variant="success" onClick={handleSave}>Zapisz</Button>
                 </Modal.Footer>
             </Modal>
-        </div>
+        </Container>
     );
 }
 
