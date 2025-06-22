@@ -120,7 +120,13 @@ function TaskView() {
                     </tr>
                 </thead>
                 <tbody>
-                    {tasks.map(task => (
+                {tasks.length === 0 && <tr>
+                    <td colSpan={10} className="text-center">
+                        Brak zadań do wyświetlenia.
+                    </td>
+                </tr>}
+
+                {tasks.map(task => (
                         <tr key={task.id ? task.id : '-'}>
                             <td>{task.name || '—'}</td>
                             <td>{task.description || '—'}</td>

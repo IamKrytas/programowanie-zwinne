@@ -25,7 +25,12 @@ const LoginForm = () => {
             window.location.href = '/home';
         }
         catch (error) {
-            toast(error?.toString());
+            const err = error?.toString() as string;
+            if (err.includes("401")) {
+                toast.error("Nieprawidłowy email lub hasło. Spróbuj ponownie.");
+            } else {
+                toast.error("Wystąpił błąd podczas logowania. Spróbuj ponownie później.");
+            }
         }
     };
 

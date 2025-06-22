@@ -133,6 +133,12 @@ function ProjectView() {
                     </tr>
                 </thead>
                 <tbody>
+                    {projects.length === 0 && <tr>
+                        <td colSpan={9} className="text-center">
+                            Brak projektów do wyświetlenia.
+                        </td>
+                    </tr>}
+
                     {projects.map((project) => (
                         <tr key={project.id}>
                             <td>{project.name}</td>

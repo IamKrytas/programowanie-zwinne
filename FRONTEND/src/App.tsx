@@ -9,28 +9,15 @@ import ChatView from "./views/ChatView.tsx";
 import ProjectView from './views/ProjectView.tsx';
 import TaskView from './views/TaskView.tsx';
 import ProjectByIdView from './views/ProjectByIdView.tsx';
-import {ToastContainer, toast} from "react-toastify";
-import {useEffect} from "react";
+import {ToastContainer} from "react-toastify";
 
 function App() {
     const token = sessionStorage.getItem("accessToken");
     const role = sessionStorage.getItem("accessRole");
     const isAdmin = role === "ADMIN";
 
-    useEffect(() => {
-        window.addEventListener("error", (event) => {
-            console.log("hi");
-            toast.error("Wystąpił błąd. Spróbuj ponownie później.");
-            event?.preventDefault();
-        });
-
-        window.addEventListener("unhandledrejection", (event) => {
-            toast("Nieobsłużony Promise: " + event.reason);
-        });
-    }, []);
-
     return (
-        <>
+        <div className={"bg-warning-subtle"} style={{minHeight: "100vh"}}>
             <ToastContainer />
             <Router>
                 {token && <Navbar />}
@@ -59,7 +46,7 @@ function App() {
                     )}
                 </Routes>
             </Router>
-        </>
+        </div>
     );
 }
 

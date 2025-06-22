@@ -16,6 +16,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import java.util.List;
+
 @Configuration
 @RequiredArgsConstructor
 public class SecurityConfig {
@@ -25,6 +27,21 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity
+            .cors(cors -> cors
+                    .configurationSource(request -> {
+                        var crs = new org.springframework.web.cors.CorsConfiguration();
+                        crs.setAllowedOrigins(List.of(
+                                "http://localhost:80",
+                                "http://localhost:8080",
+                                "http://localhost:5000",
+                                "http://localhost:5173"
+                        ));
+                        crs.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE"));
+                        crs.setAllowedHeaders(List.of("*"));
+                        crs.setAllowCredentials(true);
+                        return crs;
+                    })
+            )
             // Wstawiamy filtr JWT przed UsernamePasswordAuthenticationFilter
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
             // Wyłączamy CSRF tylko dla swaggera i endpointów publicznych
@@ -51,7 +68,7 @@ public class SecurityConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-                        .allowedOrigins("http://localhost:80/", "http://localhost:8080/", "http://localhost:5000/", "http://localhost:5173/")
+                        .allowedOrigins("http://localhost:80", "http://localhost:8080", "http://localhost:5000", "http://localhost:5173")
                         .allowedMethods("GET", "POST", "PUT", "DELETE")
                         .allowedHeaders("*")
                         .allowCredentials(true);

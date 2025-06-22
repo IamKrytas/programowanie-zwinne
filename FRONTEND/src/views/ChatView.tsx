@@ -71,7 +71,7 @@ const ChatComponent: React.FC = () => {
         <Container className="mt-4">
             <h2 className="text-center mb-4">Chat</h2>
             <Card>
-                <Card.Header>Messages</Card.Header>
+                <Card.Header>Wiadomości</Card.Header>
                 <Card.Body style={{ maxHeight: '300px', overflowY: 'auto' }}>
                     <ListGroup variant="flush">
                         {messages.map((msg, index) => (
@@ -92,11 +92,11 @@ const ChatComponent: React.FC = () => {
                             <Form.Control
                                 type="text"
                                 value={input}
-                                placeholder="Type your message"
+                                placeholder="Wpisz twoją wiadomość"
                                 onChange={(e) => setInput(e.target.value)}
                             />
                             <Button variant="primary" onClick={sendMessage}>
-                                Send
+                                Wyślij
                             </Button>
                         </Form.Group>
                     </Form>
