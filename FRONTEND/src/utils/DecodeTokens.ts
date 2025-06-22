@@ -1,4 +1,5 @@
 import { jwtDecode } from "jwt-decode";
+import {toast} from "react-toastify";
 
 interface DecodedToken {
   role: string;
@@ -21,7 +22,7 @@ export const decodeAccessToken = (accessToken: string): void => {
       console.warn("Nie udało się zapisać danych z tokena");
     }
   } catch (error: any) {
-    console.error("Błąd dekodowania tokena:", error);
+    toast("Błąd dekodowania tokena: " + error);
   }
 };
 
@@ -39,6 +40,6 @@ export const decodeRefreshToken = (refreshToken: string): void => {
       console.warn("Nie udało się zapisać danych z tokena");
     }
   } catch (error: any) {
-    console.error("Błąd dekodowania tokena:", error);
+    toast("Błąd dekodowania tokena: " + error);
   }
 };

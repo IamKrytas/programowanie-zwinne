@@ -4,6 +4,7 @@ import { Student } from '../models/Student';
 import { Teacher } from '../models/Teacher';
 import { getAllStudents, createStudent, modifyStudent, deleteStudentById } from '../controllers/adminStudentController';
 import { getAllTeachers, createTeacher, modifyTeacher, deleteTeacherById } from '../controllers/adminTeacherController';
+import {toast} from "react-toastify";
 
 function AdminPanelView() {
   const [students, setStudents] = useState<Student[]>([]);
@@ -39,7 +40,7 @@ function AdminPanelView() {
       const response = await getAllStudents();
       setStudents(response);
     } catch (error) {
-      console.error('Error fetching students:', error);
+      toast('Error fetching students: ' + error);
     }
   };
 
@@ -48,7 +49,7 @@ function AdminPanelView() {
       const response = await getAllTeachers();
       setTeachers(response);
     } catch (error) {
-      console.error('Error fetching teachers:', error);
+      toast('Error fetching teachers: ' + error);
     }
   };
 
@@ -90,7 +91,7 @@ function AdminPanelView() {
       : teachers.find(t => t.id === id);
 
     if (!data) {
-      console.error(`${type} with ID ${id} not found`);
+      toast(`${type} with ID ${id} not found`);
       return;
     }
 
@@ -133,7 +134,7 @@ function AdminPanelView() {
       setFormData({});
       setEditing(null);
     } catch (error) {
-      console.error('Error saving data:', error);
+      toast('Error saving data: ' + error);
     }
   };
 
