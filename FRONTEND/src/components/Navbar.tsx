@@ -7,11 +7,24 @@ const NavigationBar = () => {
   const role = sessionStorage.getItem('accessRole') as UserRole;
   const userName: string = sessionStorage.getItem('accessSub')?.split('@')[0] ?? 'Anonymous';
 
+  function translateRole(role: UserRole): string {
+    switch (role) {
+      case UserRole.ADMIN:
+        return 'administrator';
+      case UserRole.STUDENT:
+        return 'student';
+      case UserRole.TEACHER:
+        return 'nauczyciel';
+      default:
+        return 'nieznana rola';
+    }
+  }
+
   return (
     <Navbar bg="success" variant="dark" expand="lg">
       <Container>
         <Navbar.Brand as={Link} to="/">Moje Projekty</Navbar.Brand>
-        <Navbar.Text className="ms-3">Hello, {userName}! Your role is {role.toString().toLowerCase()}.</Navbar.Text>
+        <Navbar.Text className="ms-3">Witaj, {userName}! Twoja rola to {translateRole(role)}.</Navbar.Text>
         <Navbar.Toggle aria-controls="project-navbar-nav" />
         <Navbar.Collapse id="project-navbar-nav">
           <Nav className="ms-auto">

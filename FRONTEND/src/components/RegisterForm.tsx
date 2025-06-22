@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Button, Card, Col, Container, Form, Row } from 'react-bootstrap';
 import { Student } from '../models/Student';
 import { registerUser } from '../controllers/userController';
+import {toast} from "react-toastify";
 
 const RegisterForm = () => {
 
@@ -33,9 +34,10 @@ const RegisterForm = () => {
             const message = await registerUser(formData);
             console.log(message);
             navigate('/logowanie');
+            toast.success("Rejestracja zakończona pomyślnie! Możesz się teraz zalogować.");
         }
-        catch (error) {
-            console.error(error);
+        catch (error: unknown) {
+            toast.error(error?.toString() ?? "An unexpected error occurred. Please try again.");
         }
     };
 

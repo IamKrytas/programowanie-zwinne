@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import SockJS from 'sockjs-client';
 import { Client, IMessage, StompSubscription } from '@stomp/stompjs';
 import { Container, Form, Button, Card, ListGroup } from 'react-bootstrap';
+import {toast} from "react-toastify";
 
 const WS_URL = 'http://localhost:8080/api/v1/ws';
 
@@ -40,8 +41,8 @@ const ChatComponent: React.FC = () => {
         };
 
         stompClient.onStompError = (frame) => {
-            console.error('STOMP error:', frame.headers['message']);
-            console.error('Details:', frame.body);
+            toast('STOMP error: ' + frame.headers['message']);
+            toast('Details: ' + frame.body);
         };
 
         stompClient.activate();

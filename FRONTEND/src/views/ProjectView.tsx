@@ -4,6 +4,7 @@ import { getAllProjects, createProject, modifyProject, deleteProject } from '../
 import { Table, Button, Modal, Form } from 'react-bootstrap';
 import { Project } from '../models/Project';
 import { useNavigate } from 'react-router-dom';
+import {toast} from "react-toastify";
 
 function ProjectView() {
     const [projects, setProjects] = useState<Project[]>([]);
@@ -43,7 +44,7 @@ function ProjectView() {
             const response = await getAllProjects();
             setProjects(response);
         } catch (error) {
-            console.error("Error fetching projects:", error);
+            toast("Error fetching projects: " + error);
         }
     };
 
@@ -53,7 +54,7 @@ function ProjectView() {
             console.log("Project deleted:", id);
             handleGetProjects();
         } catch (error) {
-            console.error("Error deleting project:", error);
+            toast("Error deleting project: " + error);
         }
     };
 
@@ -102,7 +103,7 @@ function ProjectView() {
             setShowModal(false);
             handleGetProjects();
         } catch (error) {
-            console.error("Error saving project:", error);
+            toast("Error saving project:" + error);
         }
     };
 
@@ -132,6 +133,12 @@ function ProjectView() {
                     </tr>
                 </thead>
                 <tbody>
+                    {projects.length === 0 && <tr>
+                        <td colSpan={9} className="text-center">
+                            Brak projektów do wyświetlenia.
+                        </td>
+                    </tr>}
+
                     {projects.map((project) => (
                         <tr key={project.id}>
                             <td>{project.name}</td>

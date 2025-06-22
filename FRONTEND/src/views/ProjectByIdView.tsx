@@ -6,6 +6,7 @@ import { Project } from '../models/Project';
 import { Task } from '../models/Task';
 import { getProjectById } from '../controllers/projectController';
 import { getTaskById, modifyTask, createTask, deleteTask } from '../controllers/taskController';
+import {toast} from "react-toastify";
 
 function ProjectByIdView() {
     const { id } = useParams();
@@ -54,7 +55,7 @@ function ProjectByIdView() {
                 setTasks(tasksRes);
             }
         } catch (error) {
-            console.error('Błąd podczas pobierania projektu:', error);
+            toast('Błąd podczas pobierania projektu: ' + error);
         }
     };
 
@@ -64,7 +65,7 @@ function ProjectByIdView() {
             console.log("Task deleted:", id);
             handleGetProject(project?.id || '');
         } catch (error) {
-            console.error("Error deleting task:", error);
+            toast("Error deleting task: " + error);
         }
     };
 
@@ -110,7 +111,7 @@ function ProjectByIdView() {
             setShowModal(false);
             handleGetProject(project?.id || '');
         } catch (error) {
-            console.error("Error saving task:", error);
+            toast("Error saving task: " + error);
         }
     };
 
@@ -142,7 +143,13 @@ function ProjectByIdView() {
                         </tr>
                     </thead>
                     <tbody>
-                        {tasks.map(task => (
+                    {tasks.length === 0 && <tr>
+                        <td colSpan={9} className="text-center">
+                            Brak zadań do wyświetlenia.
+                        </td>
+                    </tr>}
+
+                    {tasks.map(task => (
                             <tr key={task.id}>
                                 <td>{task.name}</td>
                                 <td>{task.description}</td>
