@@ -1,3 +1,4 @@
+import {UserRole} from "../models/auth/UserRole.ts";
 import { useState, useEffect } from 'react';
 import { getAllProjects, createProject, modifyProject, deleteProject } from '../controllers/projectController';
 import { Table, Button, Modal, Form } from 'react-bootstrap';
@@ -8,6 +9,7 @@ function ProjectView() {
     const [projects, setProjects] = useState<Project[]>([]);
     const [showModal, setShowModal] = useState(false);
     const [editingProject, setEditingProject] = useState<Project | null>(null);
+    const userRole: UserRole = sessionStorage.getItem("accessRole") as UserRole;
 
     const navigate = useNavigate();
 
@@ -59,9 +61,9 @@ function ProjectView() {
         setEditingProject(project);
         setForm({
             ...project,
-            fileIds: project.fileIds.join(', '),
-            studentIds: project.studentIds.join(', '),
-            taskIds: project.taskIds.join(', '),
+            fileIds: (project.fileIds ?? []).join(', '),
+            studentIds: (project.studentIds ?? []).join(', '),
+            taskIds: (project.taskIds ?? []).join(', '),
             creationDate: project.creationDate ? new Date(project.creationDate).toISOString().slice(0, 10) : '',
             doneDate: project.doneDate ? new Date(project.doneDate).toISOString().slice(0, 10) : '',
         });
@@ -114,7 +116,7 @@ function ProjectView() {
     return (
         <div className="container mt-4">
             <h2>Zarządzanie Projektami</h2>
-            <Button variant="primary" onClick={handleCreate} className="mb-3">Dodaj Projekt</Button>
+            {userRole === "TEACHER" && <Button variant="primary" onClick={handleCreate} className="mb-3">Dodaj Projekt</Button>}
             <Table responsive striped bordered hover>
                 <thead>
                     <tr>
@@ -136,14 +138,14 @@ function ProjectView() {
                             <td>{project.description}</td>
                             <td>{project.teacherId}</td>
                             <td>{project.studentIds.join(', ')}</td>
-                            <td>{project.taskIds.join(', ')}</td>
-                            <td>{project.fileIds.join(', ')}</td>
+                            <td>{(project.taskIds ?? []).join(', ')}</td>
+                            <td>{(project.fileIds ?? []).join(', ')}</td>
                             <td>{project.creationDate ? new Date(project.creationDate).toISOString().slice(0, 10) : ''}</td>
                             <td>{project.doneDate ? new Date(project.doneDate).toISOString().slice(0, 10) : ''}</td>
                             <td>
-                                <Button size="sm" onClick={() => handleEdit(project)} className="me-2">Edytuj</Button>
+                                {userRole === "TEACHER" && <Button size="sm" onClick={() => handleEdit(project)} className="me-2">Edytuj</Button>}
                                 <Button size="sm" variant="warning" onClick={() => navigate(`/project/${project.id}`)} className="me-2">Zobacz</Button>
-                                <Button size="sm" variant="danger" onClick={() => handleDelete(project.id)}>Usuń</Button>
+                                {userRole === "TEACHER" && <Button size="sm" variant="danger" onClick={() => handleDelete(project.id)}>Usuń</Button>}
                             </td>
                         </tr>
                     ))}

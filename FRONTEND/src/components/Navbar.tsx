@@ -1,21 +1,24 @@
 import { Navbar, Nav, Container } from 'react-bootstrap';
 import { logoutUserService } from '../services/userService';
 import { Link } from "react-router-dom";
+import {UserRole} from "../models/auth/UserRole.ts";
 
 const NavigationBar = () => {
-  const role = sessionStorage.getItem('accessRole');
+  const role = sessionStorage.getItem('accessRole') as UserRole;
+  const userName: string = sessionStorage.getItem('accessSub')?.split('@')[0] ?? 'Anonymous';
 
   return (
     <Navbar bg="success" variant="dark" expand="lg">
       <Container>
         <Navbar.Brand as={Link} to="/">Moje Projekty</Navbar.Brand>
+        <Navbar.Text className="ms-3">Hello, {userName}! Your role is {role.toString().toLowerCase()}.</Navbar.Text>
         <Navbar.Toggle aria-controls="project-navbar-nav" />
         <Navbar.Collapse id="project-navbar-nav">
           <Nav className="ms-auto">
             <Nav.Link as={Link} to="/projects">Projekty</Nav.Link>
             <Nav.Link as={Link} to="/tasks">Zadania</Nav.Link>
-            <Nav.Link href="#uczestnicy">Uczestnicy</Nav.Link>
-            <Nav.Link href="#profil">Profil</Nav.Link>
+            {/*<Nav.Link href="#uczestnicy">Uczestnicy</Nav.Link>*/}
+            {/*<Nav.Link href="#profil">Profil</Nav.Link>*/}
             <Nav.Link as={Link} to="/chat">Chat</Nav.Link>
             {role === 'ADMIN' && (
               <Nav.Link as={Link} to="/admin">Panel Admina</Nav.Link>

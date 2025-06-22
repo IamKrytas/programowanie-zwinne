@@ -1,3 +1,4 @@
+import {UserRole} from "../models/auth/UserRole.ts";
 import { useState, useEffect } from 'react';
 import { getAllTasks, createTask, modifyTask, deleteTask } from '../controllers/taskController';
 import { Table, Button, Modal, Form, Container } from 'react-bootstrap';
@@ -7,6 +8,8 @@ function TaskView() {
     const [tasks, setTasks] = useState<Task[]>([]);
     const [showModal, setShowModal] = useState(false);
     const [editingTask, setEditingTask] = useState<Task | null>(null);
+
+    const userRole: UserRole = sessionStorage.getItem("accessRole") as UserRole;
 
     const emptyTask: Task = {
         id: '',
@@ -99,7 +102,7 @@ function TaskView() {
     return (
         <Container className="mt-4">
             <h2>Zarządzanie Zadaniami</h2>
-            <Button variant="primary" onClick={handleCreate} className="mb-3">Dodaj Zadanie</Button>
+            {userRole === "TEACHER" && <Button variant="primary" onClick={handleCreate} className="mb-3">Dodaj Zadanie</Button>}
             <Table responsive>
                 <thead>
                     <tr>
@@ -130,8 +133,8 @@ function TaskView() {
                             <td>{task.doneDate ? new Date(task.doneDate).toISOString().slice(0, 10)
                                 : '—'}</td>
                             <td>
-                                <Button size="sm" onClick={() => handleEdit(task)} className="me-2">Edytuj</Button>
-                                <Button size="sm" variant="danger" onClick={() => handleDelete(task.id)}>Usuń</Button>
+                                {userRole === "TEACHER" && <Button size="sm" onClick={() => handleEdit(task)} className="me-2">Edytuj</Button>}
+                                {userRole === "TEACHER" && <Button size="sm" variant="danger" onClick={() => handleDelete(task.id)}>Usuń</Button>}
                             </td>
                         </tr>
                     ))}

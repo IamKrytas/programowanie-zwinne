@@ -1,3 +1,4 @@
+import {UserRole} from "../models/auth/UserRole.ts";
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Container, Table, Button, Form, Modal } from 'react-bootstrap';
@@ -12,6 +13,8 @@ function ProjectByIdView() {
     const [tasks, setTasks] = useState<Task[]>([]);
     const [editingTask, setEditingTask] = useState<Task | null>(null);
     const [showModal, setShowModal] = useState(false);
+
+    const userRole: UserRole = sessionStorage.getItem("accessRole") as UserRole;
 
     const emptyTask: Task = {
         id: '',
@@ -121,7 +124,7 @@ function ProjectByIdView() {
             <p><strong>Data utworzenia:</strong> {project?.creationDate ? new Date(project.creationDate).toLocaleDateString() : ''}</p>
             <p><strong>Data zakończenia:</strong> {project?.doneDate ? new Date(project.doneDate).toLocaleDateString() : ''}</p>
 
-            <Button variant="primary" onClick={handleCreate} className="mb-3">Dodaj Zadanie</Button>
+            {userRole === "TEACHER" && <Button variant="primary" onClick={handleCreate} className="mb-3">Dodaj Zadanie</Button>}
             <h4 className="mt-4">Zadania</h4>
             {tasks.length > 0 ? (
                 <Table responsive>
@@ -150,8 +153,8 @@ function ProjectByIdView() {
                                 <td>{new Date(task.creationDate).toLocaleDateString()}</td>
                                 <td>{new Date(task.doneDate).toLocaleDateString()}</td>
                                 <td>
-                                    <Button size="sm" onClick={() => handleEdit(task)} className="me-2">Edytuj</Button>
-                                    <Button size="sm" variant="danger" onClick={() => handleDelete(task.id)}>Usuń</Button>
+                                    {userRole === "TEACHER" && <Button size="sm" onClick={() => handleEdit(task)} className="me-2">Edytuj</Button>}
+                                    {userRole === "TEACHER" && <Button size="sm" variant="danger" onClick={() => handleDelete(task.id)}>Usuń</Button>}
                                 </td>
                             </tr>
                         ))}

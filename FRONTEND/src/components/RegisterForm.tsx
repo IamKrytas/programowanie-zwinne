@@ -1,4 +1,5 @@
 // imports
+import {useNavigate} from "react-router-dom";
 import { useState } from 'react';
 import { Button, Card, Col, Container, Form, Row } from 'react-bootstrap';
 import { Student } from '../models/Student';
@@ -6,6 +7,7 @@ import { registerUser } from '../controllers/userController';
 
 const RegisterForm = () => {
 
+    const navigate = useNavigate();
     const [confirmPassword, setConfirmPassword] = useState('');
     const [formData, setFormData] = useState<Student>({
         name: '',
@@ -30,6 +32,7 @@ const RegisterForm = () => {
         try {
             const message = await registerUser(formData);
             console.log(message);
+            navigate('/logowanie');
         }
         catch (error) {
             console.error(error);
