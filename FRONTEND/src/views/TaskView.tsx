@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { getAllTasks, createTask, modifyTask, deleteTask } from '../controllers/taskController';
 import { Table, Button, Modal, Form, Container } from 'react-bootstrap';
 import { Task } from '../models/Task';
+import {toast} from "react-toastify";
 
 function TaskView() {
     const [tasks, setTasks] = useState<Task[]>([]);
@@ -37,7 +38,7 @@ function TaskView() {
             const response = await getAllTasks();
             setTasks(response);
         } catch (error) {
-            console.error("Error fetching tasks:", error);
+            toast("Error fetching tasks: " + error);
         }
     };
 
@@ -47,7 +48,7 @@ function TaskView() {
             console.log("Task deleted:", id);
             handleGetTasks();
         } catch (error) {
-            console.error("Error deleting task:", error);
+            toast("Error deleting task: " + error);
         }
     };
 
@@ -92,7 +93,7 @@ function TaskView() {
             setShowModal(false);
             handleGetTasks();
         } catch (error) {
-            console.error("Error saving task:", error);
+            toast("Error saving task: " + error);
         }
     };
 

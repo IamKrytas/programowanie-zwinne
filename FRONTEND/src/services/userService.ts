@@ -2,6 +2,7 @@ import { Student } from "../models/Student";
 import { LoginCredentials } from "../models/auth/LoginCredentials.ts";
 import { decodeAccessToken, decodeRefreshToken } from "../utils/DecodeTokens";
 import JwtTokenPair from "../models/auth/JwtTokenPair.ts";
+import {toast} from "react-toastify";
 
 // Register new user
 export const registerUserService = async (userData: Student): Promise<string> => {
@@ -81,7 +82,7 @@ export const logoutUserService = async (): Promise<void> => {
     sessionStorage.removeItem("accessExp");
   }
   catch (error) {
-    console.error("Błąd podczas wylogowywania:", error);
+    toast("Błąd podczas wylogowywania: " + error);
   }
   window.location.reload();
 }

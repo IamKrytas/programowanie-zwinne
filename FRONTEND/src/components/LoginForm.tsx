@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { Button, Card, Col, Container, Form, Row } from 'react-bootstrap';
 import { LoginCredentials } from '../models/auth/LoginCredentials.ts';
 import { loginUser } from '../controllers/userController';
+import {toast} from "react-toastify";
 
 const LoginForm = () => {
 
@@ -24,7 +25,7 @@ const LoginForm = () => {
             window.location.href = '/home';
         }
         catch (error) {
-            console.error(error);
+            toast(error?.toString());
         }
     };
 
