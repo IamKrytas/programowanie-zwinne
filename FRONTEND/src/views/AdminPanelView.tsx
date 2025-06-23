@@ -146,12 +146,12 @@ function AdminPanelView() {
       <Table responsive striped bordered hover>
         <thead>
           <tr>
-            <th>Name</th>
-            <th>Surname</th>
-            <th>Password</th>
+            <th>Imię</th>
+            <th>Nazwisko</th>
             <th>Email</th>
-            {type === 'student' && <th>Stationary</th>}
-            <th>Actions</th>
+            <th>Hasło</th>
+            {type === 'student' && <th>Stacjonarny?</th>}
+            <th>Akcje</th>
           </tr>
         </thead>
         <tbody>
@@ -197,10 +197,10 @@ function AdminPanelView() {
   return (
     <Container className="mt-4">
       <Tabs defaultActiveKey="students">
-        <Tab eventKey="students" title="Students">
+        <Tab eventKey="students" title="Studenci">
           {renderTable(students, 'student')}
         </Tab>
-        <Tab eventKey="teachers" title="Teachers">
+        <Tab eventKey="teachers" title="Nauczyciele">
           {renderTable(teachers, 'teacher')}
         </Tab>
       </Tabs>

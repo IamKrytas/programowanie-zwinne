@@ -31,6 +31,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final TeacherRepository teacherRepository;
 
     @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        return "OPTIONS".equalsIgnoreCase(request.getMethod());
+    }
+
+    @Override
     @SneakyThrows({IOException.class, ServletException.class})
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
