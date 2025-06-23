@@ -95,6 +95,8 @@ const RegisterForm = () => {
                                         value={formData.password}
                                         onChange={handleChange}
                                         required
+                                        minLength={8}
+                                        maxLength={50}
                                     />
                                 </Form.Group>
 

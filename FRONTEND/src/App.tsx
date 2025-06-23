@@ -12,8 +12,8 @@ import ProjectByIdView from './views/ProjectByIdView.tsx';
 import {ToastContainer} from "react-toastify";
 
 function App() {
-    const token = sessionStorage.getItem("accessToken");
-    const role = sessionStorage.getItem("accessRole");
+    const token = localStorage.getItem("accessToken");
+    const role = localStorage.getItem("accessRole");
     const isAdmin = role === "ADMIN";
 
     return (

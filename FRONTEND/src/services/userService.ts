@@ -42,13 +42,13 @@ export const loginUserService = async (userData: LoginCredentials): Promise<JwtT
   const refreshToken = data.refreshToken
   decodeAccessToken(accessToken);
   decodeRefreshToken(refreshToken);
-  sessionStorage.setItem("accessToken", accessToken);
-  sessionStorage.setItem("refreshToken", refreshToken);
+  localStorage.setItem("accessToken", accessToken);
+  localStorage.setItem("refreshToken", refreshToken);
   return data;
 }
 
 export const refreshTokenService = async (): Promise<string> => {
-  const refreshToken = sessionStorage.getItem("refreshToken");
+  const refreshToken = localStorage.getItem("refreshToken");
 
   const API_URL = "http://localhost:8080";
   const response = await fetch(`${API_URL}/api/v1/auth/token/refresh`, {
@@ -65,21 +65,21 @@ export const refreshTokenService = async (): Promise<string> => {
 
   const data = await response.json();
   const accessToken = data.accessToken;
-  sessionStorage.setItem("accessToken", accessToken);
+  localStorage.setItem("accessToken", accessToken);
   decodeAccessToken(accessToken);
   return data;
 }
 
 export const logoutUserService = async (): Promise<void> => {
   try {
-    sessionStorage.removeItem("accessToken");
-    sessionStorage.removeItem("refreshToken");
-    sessionStorage.removeItem("refreshSub");
-    sessionStorage.removeItem("refreshRole");
-    sessionStorage.removeItem("refreshExp");
-    sessionStorage.removeItem("accessSub");
-    sessionStorage.removeItem("accessRole");
-    sessionStorage.removeItem("accessExp");
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
+    localStorage.removeItem("refreshSub");
+    localStorage.removeItem("refreshRole");
+    localStorage.removeItem("refreshExp");
+    localStorage.removeItem("accessSub");
+    localStorage.removeItem("accessRole");
+    localStorage.removeItem("accessExp");
   }
   catch (error) {
     toast("Błąd podczas wylogowywania: " + error);

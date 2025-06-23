@@ -1,46 +1,44 @@
-import { Container, Row, Col, Card } from 'react-bootstrap';
+import {Container, Row, Card, Button} from 'react-bootstrap';
+import {useEffect, useState} from "react";
+import {getStats} from "../controllers/statsController.ts";
+import Stats from "../models/Stats.ts";
+import {UserRole} from "../models/auth/UserRole.ts";
 
 const HomePageView = () => {
+    const [stats, setStats] = useState<Stats | null>(null);
+    const userRole = localStorage.getItem("accessRole") as UserRole;
+
+    useEffect(() => {
+        (async () => {
+            setStats(await getStats());
+        })();
+    }, []);
+
     return (
         <div className="bg-warning-subtle min-vh-100 py-5">
             <Container>
-                <h1 className="text-center mb-4">Tablica projektu</h1>
+                <h1 className="text-center mb-4">Statystyki</h1>
                 <Row>
-                    {/* Kolumna 1 */}
-                    <Col md={4} className="mb-4">
-                        <Card>
-                            <div className="bg-success-subtle fw-bold text-success py-2 px-3">O projekcie</div>
-                            <div className="bg-light border-bottom py-2 px-3">Projekt z programowania zwinnego</div>
-                            <div className="bg-light border-bottom py-2 px-3">Dr. inż Damian Szczegielniak</div>
-                            <div className="bg-light border-bottom py-2 px-3">Start 06.03.2025</div>
-                            <div className="bg-light border-bottom py-2 px-3">Koniec 26.06.2025</div>
+                    {stats === null && "..."}
+                    {stats !== null && <p>
+                        <Card className="mb-3 text-center">
+                            <Card.Body>
+                                <Card.Text>
+                                    <strong>Liczba projektów</strong>: {(stats as Stats).totalProjects}<br/>
+                                    <strong>Liczba zadań</strong>: {(stats as Stats).totalTasks}<br/>
+                                    <strong>Liczba nauczycieli</strong>: {(stats as Stats).totalTeachers}<br/>
+                                    <strong>Liczba studentów</strong>: {(stats as Stats).totalStudents}
+                                </Card.Text>
+                            </Card.Body>
                         </Card>
-                    </Col>
-
-                    {/* Kolumna 2 */}
-                    <Col md={4} className="mb-4">
-                        <Card>
-                            <div className="bg-success-subtle fw-bold text-success py-2 px-3 ">Uczestnicy projektu</div>
-                            <a className="bg-light border-bottom py-2 px-3 d-block text-decoration-none text-dark" href={"https://github.com/Danrog303"}>Danrog303</a>
-                            <a className="bg-light border-bottom py-2 px-3 d-block text-decoration-none text-dark" href={"https://github.com/Kyandi0"}>Kyandi0</a>
-                            <a className="bg-light border-bottom py-2 px-3 d-block text-decoration-none text-dark" href={"https://github.com/IamKrytas"}>IamKrytas</a>
-                            <a className="bg-light border-bottom py-2 px-3 d-block text-decoration-none text-dark" href={"https://github.com/LikeCiastka"}>LikeCiastka</a>
-                            <a className="bg-light border-bottom py-2 px-3 d-block text-decoration-none text-dark" href={"https://github.com/Pawel-234"}>Pawel-234</a>                            
-                        </Card>
-                    </Col>
-
-                    {/* Kolumna 3 */}
-                    <Col md={4} className="mb-4">
-                        <Card>
-                            <div className="bg-success-subtle fw-bold text-success py-2 px-3">Moje zadania</div>
-                            <div className="bg-light border-bottom py-2 px-3">PLACEHOLDER</div>
-                            <div className="bg-light border-bottom py-2 px-3">PLACEHOLDER</div>
-                            <div className="bg-light border-bottom py-2 px-3">PLACEHOLDER</div>
-                            <div className="bg-light border-bottom py-2 px-3">PLACEHOLDER</div>
-                            <div className="bg-light border-bottom py-2 px-3">PLACEHOLDER</div>
-                        </Card>
-                    </Col>
+                    </p>}
                 </Row>
+
+                <div className={"text-center"}>
+                    {userRole !== "ADMIN" && <Button variant="success" href="/projects" className="mt-3 m-1">Projekty</Button>}
+                    {userRole !== "ADMIN" && <Button variant="success" href="/tasks" className="mt-3 m-1">Zadania</Button>}
+                    <Button variant="success" href="/tasks" className="mt-3 m-1">Chat</Button>
+                </div>
             </Container>
         </div>
     );

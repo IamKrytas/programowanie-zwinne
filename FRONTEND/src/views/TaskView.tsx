@@ -10,7 +10,7 @@ function TaskView() {
     const [showModal, setShowModal] = useState(false);
     const [editingTask, setEditingTask] = useState<Task | null>(null);
 
-    const userRole: UserRole = sessionStorage.getItem("accessRole") as UserRole;
+    const userRole: UserRole = localStorage.getItem("accessRole") as UserRole;
 
     const emptyTask: Task = {
         id: '',
