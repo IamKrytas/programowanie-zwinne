@@ -1,7 +1,7 @@
 import { Project } from "../models/Project";
 
 export const getAllProjectsService = async (): Promise<Project[]> => {
-    const token = sessionStorage.getItem("accessToken");
+    const token = localStorage.getItem("accessToken");
     const API_URL = "http://localhost:8080";
     const response = await fetch(`${API_URL}/api/v1/project?offset=0&limit=10`, {
         method: "GET",
@@ -20,7 +20,7 @@ export const getAllProjectsService = async (): Promise<Project[]> => {
 }
 
 export const getProjectByIdService = async (id: string): Promise<Project> => {
-    const token = sessionStorage.getItem("accessToken");
+    const token = localStorage.getItem("accessToken");
     const API_URL = "http://localhost:8080";
     const respone = await fetch(`${API_URL}/api/v1/project/${id}`, {
         method: "GET",
@@ -38,7 +38,7 @@ export const getProjectByIdService = async (id: string): Promise<Project> => {
 
 
 export const createProjectService = async (project: Project): Promise<Project> => {
-    const token = sessionStorage.getItem("accessToken");
+    const token = localStorage.getItem("accessToken");
     const API_URL = "http://localhost:8080";
     const response = await fetch(`${API_URL}/api/v1/project`, {
         method: "POST",
@@ -57,7 +57,7 @@ export const createProjectService = async (project: Project): Promise<Project> =
 }
 
 export const modifyProjectByIdService = async (project: Project): Promise<Project> => {
-    const token = sessionStorage.getItem("accessToken");
+    const token = localStorage.getItem("accessToken");
     const API_URL = "http://localhost:8080";
     const response = await fetch(`${API_URL}/api/v1/project/${project.id}`, {
         method: "PUT",
@@ -76,7 +76,7 @@ export const modifyProjectByIdService = async (project: Project): Promise<Projec
 }
 
 export const deleteProjectByIdService = async (id: string): Promise<void> => {
-    const token = sessionStorage.getItem("accessToken");
+    const token = localStorage.getItem("accessToken");
     const API_URL = "http://localhost:8080";
     const response = await fetch(`${API_URL}/api/v1/project/${id}`, {
         method: "DELETE",

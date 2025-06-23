@@ -1,7 +1,7 @@
 import { Task } from "../models/Task";
 
 export const getAllTasksService = async (): Promise<Task[]> => {
-    const token = sessionStorage.getItem("accessToken");
+    const token = localStorage.getItem("accessToken");
     const API_URL = "http://localhost:8080";
     const response = await fetch(`${API_URL}/api/v1/task?offset=0&limit=10`, {
         method: "GET",
@@ -20,7 +20,7 @@ export const getAllTasksService = async (): Promise<Task[]> => {
 }
 
 export const getTaskByIdService = async (id: string): Promise<Task> => {
-    const token = sessionStorage.getItem("accessToken");
+    const token = localStorage.getItem("accessToken");
     const API_URL = "http://localhost:8080";
     const response = await fetch(`${API_URL}/api/v1/task/${id}`, {
         method: "GET",
@@ -37,7 +37,7 @@ export const getTaskByIdService = async (id: string): Promise<Task> => {
 }
 
 export const createTaskService = async (task: Task): Promise<Task> => {
-    const token = sessionStorage.getItem("accessToken");
+    const token = localStorage.getItem("accessToken");
     const API_URL = "http://localhost:8080";
     const response = await fetch(`${API_URL}/api/v1/task`, {
         method: "POST",
@@ -55,7 +55,7 @@ export const createTaskService = async (task: Task): Promise<Task> => {
 }
 
 export const modifyTaskByIdService = async (task: Task): Promise<Task> => {
-    const token = sessionStorage.getItem("accessToken");
+    const token = localStorage.getItem("accessToken");
     const API_URL = "http://localhost:8080";
     const response = await fetch(`${API_URL}/api/v1/task/${task.id}`, {
         method: "PUT",
@@ -73,7 +73,7 @@ export const modifyTaskByIdService = async (task: Task): Promise<Task> => {
 }
 
 export const deleteTaskByIdService = async (id: string): Promise<void> => {
-    const token = sessionStorage.getItem("accessToken");
+    const token = localStorage.getItem("accessToken");
     const API_URL = "http://localhost:8080";
     const response = await fetch(`${API_URL}/api/v1/task/${id}`, {
         method: "DELETE",

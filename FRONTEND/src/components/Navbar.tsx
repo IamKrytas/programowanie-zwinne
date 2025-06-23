@@ -4,8 +4,8 @@ import { Link } from "react-router-dom";
 import {UserRole} from "../models/auth/UserRole.ts";
 
 const NavigationBar = () => {
-  const role = sessionStorage.getItem('accessRole') as UserRole;
-  const userName: string = sessionStorage.getItem('accessSub')?.split('@')[0] ?? 'Anonymous';
+  const role = localStorage.getItem('accessRole') as UserRole;
+  const userName: string = localStorage.getItem('accessSub')?.split('@')[0] ?? 'Anonymous';
 
   function translateRole(role: UserRole): string {
     switch (role) {

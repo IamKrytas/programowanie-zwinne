@@ -10,7 +10,7 @@ function ProjectView() {
     const [projects, setProjects] = useState<Project[]>([]);
     const [showModal, setShowModal] = useState(false);
     const [editingProject, setEditingProject] = useState<Project | null>(null);
-    const userRole: UserRole = sessionStorage.getItem("accessRole") as UserRole;
+    const userRole: UserRole = localStorage.getItem("accessRole") as UserRole;
 
     const navigate = useNavigate();
 

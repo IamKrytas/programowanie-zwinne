@@ -20,7 +20,7 @@ const ChatComponent: React.FC = () => {
     const subscriptionRef = useRef<StompSubscription | null>(null);
 
     useEffect(() => {
-        const sub = sessionStorage.getItem('refreshSub') as string;
+        const sub = localStorage.getItem('refreshSub') as string;
         const name = sub.split('@')[0];
         setUsername(name);
 
