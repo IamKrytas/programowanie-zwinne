@@ -1,17 +1,28 @@
-import {UserRole} from "../models/auth/UserRole.ts";
 import { useState, useEffect } from 'react';
-import { getAllProjects, createProject, modifyProject, deleteProject } from '../controllers/projectController';
 import { Table, Button, Modal, Form } from 'react-bootstrap';
-import { Project } from '../models/Project';
 import { useNavigate } from 'react-router-dom';
-import {toast} from "react-toastify";
+import { toast } from "react-toastify";
+
+import { UserRole } from "../models/auth/UserRole.ts";
+import { getAllProjects, createProject, modifyProject, deleteProject } from '../controllers/projectController';
+import { getAllStudents, getAllTeachers } from '../controllers/listUsersController.ts';
+import { getAllTasks } from "../controllers/taskController.ts";
+
+import { Project } from '../models/Project';
+import { Teacher } from "../models/Teacher.ts";
+import { Student } from "../models/Student.ts";
+import { Task } from "../models/Task.ts";
 
 function ProjectView() {
     const [projects, setProjects] = useState<Project[]>([]);
+    const [tasks, setTasks] = useState<Task[]>([]);
+    const [listTeachers, setListTeachers] = useState<Teacher[]>([]);
+    const [listStudents, setListStudents] = useState<Student[]>([]);
+
     const [showModal, setShowModal] = useState(false);
     const [editingProject, setEditingProject] = useState<Project | null>(null);
-    const userRole: UserRole = localStorage.getItem("accessRole") as UserRole;
 
+    const userRole: UserRole = localStorage.getItem("accessRole") as UserRole;
     const navigate = useNavigate();
 
     const emptyProject: Project = {
@@ -37,6 +48,9 @@ function ProjectView() {
 
     useEffect(() => {
         handleGetProjects();
+        handleGetListAllTeachers();
+        handleGetListAllStudents();
+        handleGetTasks();
     }, []);
 
     const handleGetProjects = async () => {
@@ -44,17 +58,43 @@ function ProjectView() {
             const response = await getAllProjects();
             setProjects(response);
         } catch (error) {
-            toast("Error fetching projects: " + error);
+            toast("Błąd pobierania projektów: " + error);
+        }
+    };
+
+    const handleGetListAllTeachers = async () => {
+        try {
+            const response = await getAllTeachers();
+            setListTeachers(response);
+        } catch (error) {
+            toast("Błąd pobierania nauczycieli: " + error);
+        }
+    };
+
+    const handleGetListAllStudents = async () => {
+        try {
+            const response = await getAllStudents();
+            setListStudents(response);
+        } catch (error) {
+            toast("Błąd pobierania studentów: " + error);
+        }
+    };
+
+    const handleGetTasks = async () => {
+        try {
+            const response = await getAllTasks();
+            setTasks(response);
+        } catch (error) {
+            toast("Błąd pobierania zadań: " + error);
         }
     };
 
     const handleDelete = async (id: string) => {
         try {
             await deleteProject(id);
-            console.log("Project deleted:", id);
             handleGetProjects();
         } catch (error) {
-            toast("Error deleting project: " + error);
+            toast("Błąd usuwania projektu: " + error);
         }
     };
 
@@ -87,9 +127,9 @@ function ProjectView() {
     const handleSave = async () => {
         const payload: Project = {
             ...form,
-            fileIds: (form.fileIds ?? []).split(','),
-            studentIds: (form.studentIds ?? []).split(','),
-            taskIds: (form.taskIds ?? []).split(','),
+            fileIds: form.fileIds ? form.fileIds.split(',').map(s => s.trim()) : [],
+            studentIds: form.studentIds ? form.studentIds.split(',').map(s => s.trim()) : [],
+            taskIds: form.taskIds ? form.taskIds.split(',').map(s => s.trim()) : [],
             creationDate: form.creationDate ? new Date(form.creationDate) : new Date(),
             doneDate: form.doneDate ? new Date(form.doneDate) : new Date(),
         };
@@ -103,7 +143,7 @@ function ProjectView() {
             setShowModal(false);
             handleGetProjects();
         } catch (error) {
-            toast("Error saving project:" + error);
+            toast("Błąd zapisu projektu: " + error);
         }
     };
 
@@ -117,45 +157,68 @@ function ProjectView() {
     return (
         <div className="container mt-4">
             <h2>Zarządzanie Projektami</h2>
-            {userRole === "TEACHER" && <Button variant="primary" onClick={handleCreate} className="mb-3">Dodaj Projekt</Button>}
+
+            {userRole === "TEACHER" && (
+                <Button variant="primary" onClick={handleCreate} className="mb-3">Dodaj Projekt</Button>
+            )}
+
             <Table responsive striped bordered hover>
                 <thead>
                     <tr>
                         <th>Nazwa</th>
                         <th>Opis</th>
-                        <th>ID Nauczyciela</th>
-                        <th>ID Studentów</th>
-                        <th>ID Zadań</th>
-                        <th>ID Plików</th>
+                        <th>Nauczyciel</th>
+                        <th>Studenci</th>
+                        <th>Zadania</th>
+                        <th>Pliki</th>
                         <th>Data Utworzenia</th>
                         <th>Data Zakończenia</th>
                         <th>Akcje</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {projects.length === 0 && <tr>
-                        <td colSpan={9} className="text-center">
-                            Brak projektów do wyświetlenia.
-                        </td>
-                    </tr>}
-
-                    {projects.map((project) => (
-                        <tr key={project.id}>
-                            <td>{project.name}</td>
-                            <td>{project.description}</td>
-                            <td>{project.teacherId}</td>
-                            <td>{project.studentIds.join(', ')}</td>
-                            <td>{(project.taskIds ?? []).join(', ')}</td>
-                            <td>{(project.fileIds ?? []).join(', ')}</td>
-                            <td>{project.creationDate ? new Date(project.creationDate).toISOString().slice(0, 10) : ''}</td>
-                            <td>{project.doneDate ? new Date(project.doneDate).toISOString().slice(0, 10) : ''}</td>
-                            <td>
-                                {userRole === "TEACHER" && <Button size="sm" onClick={() => handleEdit(project)} className="me-2">Edytuj</Button>}
-                                <Button size="sm" variant="warning" onClick={() => navigate(`/project/${project.id}`)} className="me-2">Zobacz</Button>
-                                {userRole === "TEACHER" && <Button size="sm" variant="danger" onClick={() => handleDelete(project.id)}>Usuń</Button>}
-                            </td>
+                    {projects.length === 0 ? (
+                        <tr>
+                            <td colSpan={9} className="text-center">Brak projektów do wyświetlenia.</td>
                         </tr>
-                    ))}
+                    ) : (
+                        projects.map((project) => (
+                            <tr key={project.id}>
+                                <td>{project.name}</td>
+                                <td>{project.description}</td>
+                                <td>
+                                    {(() => {
+                                        const teacher = listTeachers.find(t => t.id === project.teacherId);
+                                        return teacher ? `${teacher.name} ${teacher.surname}` : '';
+                                    })()}
+                                </td>
+                                <td>
+                                    {(project.studentIds ?? []).map(id => {
+                                        const student = listStudents.find(s => s.id === id);
+                                        return student ? `${student.name} ${student.surname}` : '';
+                                    }).join(', ')}
+                                </td>
+                                <td>
+                                    {(project.taskIds ?? []).map(id => {
+                                        const task = tasks.find(t => t.id === id);
+                                        return task ? task.name : '';
+                                    }).join(', ')}
+                                </td>
+                                <td>{(project.fileIds ?? []).join(', ')}</td>
+                                <td>{new Date(project.creationDate).toISOString().slice(0, 10)}</td>
+                                <td>{new Date(project.doneDate).toISOString().slice(0, 10)}</td>
+                                <td>
+                                    {userRole === "TEACHER" && (
+                                        <Button size="sm" onClick={() => handleEdit(project)} className="me-2">Edytuj</Button>
+                                    )}
+                                    <Button size="sm" variant="warning" onClick={() => navigate(`/project/${project.id}`)} className="me-2">Zobacz</Button>
+                                    {userRole === "TEACHER" && (
+                                        <Button size="sm" variant="danger" onClick={() => handleDelete(project.id)}>Usuń</Button>
+                                    )}
+                                </td>
+                            </tr>
+                        ))
+                    )}
                 </tbody>
             </Table>
 
@@ -182,28 +245,52 @@ function ProjectView() {
                             />
                         </Form.Group>
                         <Form.Group className="mb-2">
-                            <Form.Label>ID Nauczyciela</Form.Label>
-                            <Form.Control
-                                type="text"
+                            <Form.Label>Wybierz Nauczyciela</Form.Label>
+                            <Form.Select
                                 value={form.teacherId}
                                 onChange={(e) => handleInputChange('teacherId', e.target.value)}
-                            />
+                            >
+                                <option value="">Wybierz Nauczyciela</option>
+                                {listTeachers.map((teacher) => (
+                                    <option key={teacher.id} value={teacher.id}>
+                                        {teacher.name} {teacher.surname}
+                                    </option>
+                                ))}
+                            </Form.Select>
                         </Form.Group>
                         <Form.Group className="mb-2">
-                            <Form.Label>ID Studentów (oddzielone przecinkami)</Form.Label>
-                            <Form.Control
-                                type="text"
-                                value={form.studentIds}
-                                onChange={(e) => handleInputChange('studentIds', e.target.value)}
-                            />
+                            <Form.Label>Wybierz Studentów</Form.Label>
+                            <Form.Select
+                                multiple
+                                value={form.studentIds ? form.studentIds.split(',').map(id => id.trim()) : []}
+                                onChange={(e) => {
+                                    const selectedOptions = Array.from(e.target.selectedOptions, option => option.value);
+                                    handleInputChange('studentIds', selectedOptions.join(','));
+                                }}
+                            >
+                                {listStudents.map((student) => (
+                                    <option key={student.id} value={student.id}>
+                                        {student.name} {student.surname}
+                                    </option>
+                                ))}
+                            </Form.Select>
                         </Form.Group>
                         <Form.Group className="mb-2">
-                            <Form.Label>ID Zadań (oddzielone przecinkami)</Form.Label>
-                            <Form.Control
-                                type="text"
-                                value={form.taskIds}
-                                onChange={(e) => handleInputChange('taskIds', e.target.value)}
-                            />
+                            <Form.Label>Wybierz Zadania</Form.Label>
+                            <Form.Select
+                                multiple
+                                value={form.taskIds ? form.taskIds.split(',').map(id => id.trim()) : []}
+                                onChange={(e) => {
+                                    const selectedOptions = Array.from(e.target.selectedOptions, option => option.value);
+                                    handleInputChange('taskIds', selectedOptions.join(','));
+                                }}
+                            >
+                                {tasks.map((task) => (
+                                    <option key={task.id} value={task.id}>
+                                        {task.name}
+                                    </option>
+                                ))}
+                            </Form.Select>
                         </Form.Group>
                         <Form.Group className="mb-2">
                             <Form.Label>ID Plików (oddzielone przecinkami)</Form.Label>
