@@ -1,12 +1,11 @@
 import {Student} from "../models/Student.ts";
 import {Teacher} from "../models/Teacher.ts";
-import {getAllStudentsService} from "../services/adminStudentService.ts";
-import {getAllTeachersService} from "../services/adminTeacherService.ts";
+import {listAllStudentsService,  listAllTeachersService} from "../services/listUsersService.ts";
 
 export const getAllStudents = async (): Promise<Student[]> => {
-    return getAllStudentsService();
+    return listAllStudentsService();
 }
 
 export const getAllTeachers = async (): Promise<Teacher[]> => {
-    return getAllTeachersService();
+    return listAllTeachersService();
 }
