@@ -159,15 +159,15 @@ function ProjectByIdView() {
 
             <h4>Zadania</h4>
             {tasks.length > 0 ? (
-                <Table responsive>
+                <Table responsive striped bordered hover>
                     <thead>
                         <tr>
                             <th>Nazwa</th>
                             <th>Opis</th>
-                            <th>Priorytet</th>
                             <th>Student</th>
                             <th>Nauczyciel</th>
                             <th>Pliki</th>
+                            <th>Priorytet</th>
                             <th>Utworzono</th>
                             <th>Zakończono</th>
                             <th>Akcje</th>
@@ -181,10 +181,10 @@ function ProjectByIdView() {
                                 <tr key={task.id}>
                                     <td>{task.name}</td>
                                     <td>{task.description}</td>
-                                    <td>{task.priority}</td>
                                     <td>{student ? `${student.name} ${student.surname}` : 'Brak'}</td>
                                     <td>{teacher ? `${teacher.name} ${teacher.surname}` : 'Brak'}</td>
                                     <td>{task.fileIds.join(', ')}</td>
+                                    <td>{task.priority}</td>
                                     <td>{new Date(task.creationDate).toLocaleDateString()}</td>
                                     <td>{new Date(task.doneDate).toLocaleDateString()}</td>
                                     <td>
@@ -211,6 +211,7 @@ function ProjectByIdView() {
                 </Modal.Header>
                 <Modal.Body>
                     <Form>
+
                         <Form.Group className="mb-2">
                             <Form.Label>Nazwa</Form.Label>
                             <Form.Control
@@ -219,29 +220,17 @@ function ProjectByIdView() {
                                 onChange={e => setForm({ ...form, name: e.target.value })}
                             />
                         </Form.Group>
+
                         <Form.Group className="mb-2">
                             <Form.Label>Opis</Form.Label>
                             <Form.Control
                                 as="textarea"
-                                rows={3}
+                                rows={1}
                                 value={form.description}
                                 onChange={e => setForm({ ...form, description: e.target.value })}
                             />
                         </Form.Group>
-                        <Form.Group className="mb-2">
-                            <Form.Label>Nauczyciel</Form.Label>
-                            <Form.Select
-                                value={form.teacherId}
-                                onChange={e => setForm({ ...form, teacherId: e.target.value })}
-                            >
-                                <option value="">Wybierz nauczyciela</option>
-                                {teachers.map(t => (
-                                    <option key={t.id} value={t.id}>
-                                        {t.name} {t.surname}
-                                    </option>
-                                ))}
-                            </Form.Select>
-                        </Form.Group>
+
                         <Form.Group className="mb-2">
                             <Form.Label>Student</Form.Label>
                             <Form.Select
@@ -256,14 +245,22 @@ function ProjectByIdView() {
                                 ))}
                             </Form.Select>
                         </Form.Group>
+
                         <Form.Group className="mb-2">
-                            <Form.Label>Priorytet</Form.Label>
-                            <Form.Control
-                                type="number"
-                                value={form.priority}
-                                onChange={e => setForm({ ...form, priority: Number(e.target.value) })}
-                            />
+                            <Form.Label>Nauczyciel</Form.Label>
+                            <Form.Select
+                                value={form.teacherId}
+                                onChange={e => setForm({ ...form, teacherId: e.target.value })}
+                            >
+                                <option value="">Wybierz nauczyciela</option>
+                                {teachers.map(t => (
+                                    <option key={t.id} value={t.id}>
+                                        {t.name} {t.surname}
+                                    </option>
+                                ))}
+                            </Form.Select>
                         </Form.Group>
+
                         <Form.Group className="mb-2">
                             <Form.Label>ID Plików</Form.Label>
                             <Form.Control
@@ -273,6 +270,16 @@ function ProjectByIdView() {
                                 placeholder="np. file1,file2"
                             />
                         </Form.Group>
+
+                        <Form.Group className="mb-2">
+                            <Form.Label>Priorytet</Form.Label>
+                            <Form.Control
+                                type="number"
+                                value={form.priority}
+                                onChange={e => setForm({ ...form, priority: Number(e.target.value) })}
+                            />
+                        </Form.Group>
+
                         <Form.Group className="mb-2">
                             <Form.Label>Data utworzenia</Form.Label>
                             <Form.Control
@@ -281,6 +288,7 @@ function ProjectByIdView() {
                                 onChange={e => setForm({ ...form, creationDate: e.target.value })}
                             />
                         </Form.Group>
+
                         <Form.Group className="mb-2">
                             <Form.Label>Data zakończenia</Form.Label>
                             <Form.Control
