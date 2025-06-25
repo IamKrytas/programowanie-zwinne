@@ -1,19 +1,26 @@
-import {UserRole} from "../models/auth/UserRole.ts";
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Container, Table, Button, Form, Modal } from 'react-bootstrap';
-import { Project } from '../models/Project';
-import { Task } from '../models/Task';
+import { toast } from "react-toastify";
+
+import { UserRole } from "../models/auth/UserRole.ts";
+import { Project } from '../models/Project.ts';
+import { Teacher } from "../models/Teacher.ts";
+import { Student } from "../models/Student.ts";
+import { Task } from "../models/Task.ts";
+
 import { getProjectById } from '../controllers/projectController';
 import { getTaskById, modifyTask, createTask, deleteTask } from '../controllers/taskController';
-import {toast} from "react-toastify";
+import { getAllStudents, getAllTeachers } from '../controllers/listUsersController.ts';
 
 function ProjectByIdView() {
-    const { id } = useParams();
+    const { id } = useParams<{ id: string }>();
     const [project, setProject] = useState<Project | null>(null);
     const [tasks, setTasks] = useState<Task[]>([]);
     const [editingTask, setEditingTask] = useState<Task | null>(null);
     const [showModal, setShowModal] = useState(false);
+    const [teachers, setTeachers] = useState<Teacher[]>([]);
+    const [students, setStudents] = useState<Student[]>([]);
 
     const userRole: UserRole = localStorage.getItem("accessRole") as UserRole;
 
@@ -30,7 +37,7 @@ function ProjectByIdView() {
         doneDate: new Date()
     };
 
-    const [form, setForm] = useState<any>({
+    const [form, setForm] = useState({
         ...emptyTask,
         fileIds: '',
         creationDate: '',
@@ -38,68 +45,86 @@ function ProjectByIdView() {
     });
 
     useEffect(() => {
-        if (id) {
-            handleGetProject(id);
-        }
+        if (!id) return;
+        loadProjectAndTasks(id);
+        loadTeachers();
+        loadStudents();
     }, [id]);
 
-    const handleGetProject = async (id: string) => {
+    const loadProjectAndTasks = async (projectId: string) => {
         try {
-            const fetchedProject = await getProjectById(id);
+            const fetchedProject = await getProjectById(projectId);
             setProject(fetchedProject);
 
-            if (fetchedProject.taskIds.length > 0) {
-                const tasksRes = await Promise.all(
-                    fetchedProject.taskIds.map((taskId: string) => getTaskById(taskId))
-                );
-                setTasks(tasksRes);
+            if (fetchedProject.taskIds?.length > 0) {
+                const fetchedTasks = await Promise.all(fetchedProject.taskIds.map(getTaskById));
+                setTasks(fetchedTasks);
+            } else {
+                setTasks([]);
             }
         } catch (error) {
-            toast('Błąd podczas pobierania projektu: ' + error);
+            toast.error(`Błąd podczas pobierania projektu: ${error}`);
         }
     };
 
-    const handleDelete = async (id: string) => {
+    const loadTeachers = async () => {
         try {
-            await deleteTask(id);
-            console.log("Task deleted:", id);
-            handleGetProject(project?.id || '');
+            const result = await getAllTeachers();
+            setTeachers(result);
         } catch (error) {
-            toast("Error deleting task: " + error);
+            toast.error(`Błąd pobierania nauczycieli: ${error}`);
         }
     };
 
-    const handleEdit = (task: Task) => {
+    const loadStudents = async () => {
+        try {
+            const result = await getAllStudents();
+            setStudents(result);
+        } catch (error) {
+            toast.error(`Błąd pobierania studentów: ${error}`);
+        }
+    };
+
+    const handleDeleteTask = async (taskId: string) => {
+        try {
+            await deleteTask(taskId);
+            if (project?.id) loadProjectAndTasks(project.id);
+        } catch (error) {
+            toast.error(`Błąd usuwania zadania: ${error}`);
+        }
+    };
+
+    const handleEditTask = (task: Task) => {
         setEditingTask(task);
         setForm({
             ...task,
             fileIds: task.fileIds.join(','),
             creationDate: task.creationDate ? new Date(task.creationDate).toISOString().slice(0, 10) : '',
-            doneDate: task.doneDate ? new Date(task.doneDate).toISOString().slice(0, 10) : '',
+            doneDate: task.doneDate ? new Date(task.doneDate).toISOString().slice(0, 10) : ''
         });
         setShowModal(true);
     };
 
-    const handleCreate = () => {
+    const handleCreateTask = () => {
         setEditingTask(null);
         setForm({
             ...emptyTask,
             fileIds: '',
-            doneDate: '',
-            creationDate: ''
+            creationDate: '',
+            doneDate: ''
         });
         setShowModal(true);
     };
 
-    const handleSave = async () => {
+    const handleSaveTask = async () => {
         const payload: Task = {
             ...form,
-            fileIds: form.fileIds.split(',').map((id: string) => id.trim()),
+            fileIds: form.fileIds.split(',').map(id => id.trim()),
             projectId: project?.id || '',
-            assignedStudentId: parseInt(form.assignedStudentId),
-            priority: parseInt(form.priority),
-            doneDate: new Date(form.doneDate),
+            assignedStudentId: Number(form.assignedStudentId),
+            priority: Number(form.priority),
             creationDate: new Date(form.creationDate),
+            doneDate: new Date(form.doneDate)
         };
 
         try {
@@ -109,122 +134,174 @@ function ProjectByIdView() {
                 await createTask(payload);
             }
             setShowModal(false);
-            handleGetProject(project?.id || '');
+            if (project?.id) loadProjectAndTasks(project.id);
         } catch (error) {
-            toast("Error saving task: " + error);
+            toast.error(`Błąd zapisu zadania: ${error}`);
         }
     };
 
+    const projectTeacher = teachers.find(t => t.id === project?.teacherId);
+    const projectStudents = students.filter(s => project?.studentIds.includes(String(s.id)));
+
     return (
         <Container className="mt-4">
-            <h2>Szczegóły Projektu: {project?.name}</h2>
+            <h2>Projekt: {project?.name}</h2>
             <p><strong>Opis:</strong> {project?.description}</p>
-            <p><strong>Nauczyciel:</strong> {project?.teacherId}</p>
-            <p><strong>Studenci:</strong> {project?.studentIds?.join(', ')}</p>
+            <p><strong>Nauczyciel:</strong> {projectTeacher ? `${projectTeacher.name} ${projectTeacher.surname}` : 'Brak'}</p>
+            <p><strong>Studenci:</strong> {projectStudents.map(s => `${s.name} ${s.surname}`).join(', ') || 'Brak'}</p>
             <p><strong>Pliki:</strong> {project?.fileIds?.join(', ')}</p>
-            <p><strong>Data utworzenia:</strong> {project?.creationDate ? new Date(project.creationDate).toLocaleDateString() : ''}</p>
-            <p><strong>Data zakończenia:</strong> {project?.doneDate ? new Date(project.doneDate).toLocaleDateString() : ''}</p>
+            <p><strong>Data utworzenia:</strong> {project?.creationDate && new Date(project.creationDate).toLocaleDateString()}</p>
+            <p><strong>Data zakończenia:</strong> {project?.doneDate && new Date(project.doneDate).toLocaleDateString()}</p>
 
-            {userRole === "TEACHER" && <Button variant="primary" onClick={handleCreate} className="mb-3">Dodaj Zadanie</Button>}
-            <h4 className="mt-4">Zadania</h4>
+            {userRole === "TEACHER" && (
+                <Button className="mb-3" onClick={handleCreateTask}>Dodaj Zadanie</Button>
+            )}
+
+            <h4>Zadania</h4>
             {tasks.length > 0 ? (
-                <Table responsive>
+                <Table responsive striped bordered hover>
                     <thead>
                         <tr>
                             <th>Nazwa</th>
                             <th>Opis</th>
-                            <th>Priorytet</th>
-                            <th>Przypisany student</th>
+                            <th>Student</th>
                             <th>Nauczyciel</th>
                             <th>Pliki</th>
-                            <th>Data utworzenia</th>
-                            <th>Data zakończenia</th>
+                            <th>Priorytet</th>
+                            <th>Utworzono</th>
+                            <th>Zakończono</th>
                             <th>Akcje</th>
                         </tr>
                     </thead>
                     <tbody>
-                    {tasks.length === 0 && <tr>
-                        <td colSpan={10} className="text-center">
-                            Brak zadań do wyświetlenia.
-                        </td>
-                    </tr>}
-
-                    {tasks.map(task => (
-                            <tr key={task.id}>
-                                <td>{task.name}</td>
-                                <td>{task.description}</td>
-                                <td>{task.priority}</td>
-                                <td>{task.assignedStudentId}</td>
-                                <td>{task.teacherId}</td>
-                                <td>{task.fileIds.join(', ')}</td>
-                                <td>{new Date(task.creationDate).toLocaleDateString()}</td>
-                                <td>{new Date(task.doneDate).toLocaleDateString()}</td>
-                                <td>
-                                    {userRole === "TEACHER" && <Button size="sm" onClick={() => handleEdit(task)} className="me-2">Edytuj</Button>}
-                                    {userRole === "TEACHER" && <Button size="sm" variant="danger" onClick={() => handleDelete(task.id)}>Usuń</Button>}
-                                </td>
-                            </tr>
-                        ))}
+                        {tasks.map(task => {
+                            const student = students.find(s => String(s.id) === String(task.assignedStudentId));
+                            const teacher = teachers.find(t => t.id === task.teacherId);
+                            return (
+                                <tr key={task.id}>
+                                    <td>{task.name}</td>
+                                    <td>{task.description}</td>
+                                    <td>{student ? `${student.name} ${student.surname}` : 'Brak'}</td>
+                                    <td>{teacher ? `${teacher.name} ${teacher.surname}` : 'Brak'}</td>
+                                    <td>{task.fileIds.join(', ')}</td>
+                                    <td>{task.priority}</td>
+                                    <td>{new Date(task.creationDate).toLocaleDateString()}</td>
+                                    <td>{new Date(task.doneDate).toLocaleDateString()}</td>
+                                    <td>
+                                        {userRole === "TEACHER" && (
+                                            <>
+                                                <Button size="sm" onClick={() => handleEditTask(task)} className="me-2">Edytuj</Button>
+                                                <Button size="sm" variant="danger" onClick={() => handleDeleteTask(task.id)}>Usuń</Button>
+                                            </>
+                                        )}
+                                    </td>
+                                </tr>
+                            );
+                        })}
                     </tbody>
                 </Table>
             ) : (
                 <p>Brak przypisanych zadań.</p>
             )}
 
-            {/* Modal do edycji/dodania */}
+            {/* Modal formularza */}
             <Modal show={showModal} onHide={() => setShowModal(false)}>
                 <Modal.Header closeButton>
                     <Modal.Title>{editingTask ? 'Edytuj Zadanie' : 'Nowe Zadanie'}</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <Form>
-                        {['name', 'description', 'teacherId', 'fileIds'].map(field => (
-                            <Form.Group key={field} className="mb-2">
-                                <Form.Label>{field}</Form.Label>
-                                <Form.Control
-                                    type="text"
-                                    value={form[field]}
-                                    onChange={(e) => setForm({ ...form, [field]: e.target.value })}
-                                />
-                            </Form.Group>
-                        ))}
+
                         <Form.Group className="mb-2">
-                            <Form.Label>assignedStudentId</Form.Label>
+                            <Form.Label>Nazwa</Form.Label>
                             <Form.Control
-                                type="number"
-                                value={form.assignedStudentId}
-                                onChange={(e) => setForm({ ...form, assignedStudentId: e.target.value })}
+                                type="text"
+                                value={form.name}
+                                onChange={e => setForm({ ...form, name: e.target.value })}
                             />
                         </Form.Group>
+
                         <Form.Group className="mb-2">
-                            <Form.Label>priority</Form.Label>
+                            <Form.Label>Opis</Form.Label>
+                            <Form.Control
+                                as="textarea"
+                                rows={1}
+                                value={form.description}
+                                onChange={e => setForm({ ...form, description: e.target.value })}
+                            />
+                        </Form.Group>
+
+                        <Form.Group className="mb-2">
+                            <Form.Label>Student</Form.Label>
+                            <Form.Select
+                                value={form.assignedStudentId}
+                                onChange={e => setForm({ ...form, assignedStudentId: Number(e.target.value) })}
+                            >
+                                <option value="">Wybierz studenta</option>
+                                {students.map(s => (
+                                    <option key={s.id} value={s.id}>
+                                        {s.name} {s.surname}
+                                    </option>
+                                ))}
+                            </Form.Select>
+                        </Form.Group>
+
+                        <Form.Group className="mb-2">
+                            <Form.Label>Nauczyciel</Form.Label>
+                            <Form.Select
+                                value={form.teacherId}
+                                onChange={e => setForm({ ...form, teacherId: e.target.value })}
+                            >
+                                <option value="">Wybierz nauczyciela</option>
+                                {teachers.map(t => (
+                                    <option key={t.id} value={t.id}>
+                                        {t.name} {t.surname}
+                                    </option>
+                                ))}
+                            </Form.Select>
+                        </Form.Group>
+
+                        <Form.Group className="mb-2">
+                            <Form.Label>ID Plików</Form.Label>
+                            <Form.Control
+                                type="text"
+                                value={form.fileIds}
+                                onChange={e => setForm({ ...form, fileIds: e.target.value })}
+                                placeholder="np. file1,file2"
+                            />
+                        </Form.Group>
+
+                        <Form.Group className="mb-2">
+                            <Form.Label>Priorytet</Form.Label>
                             <Form.Control
                                 type="number"
                                 value={form.priority}
-                                onChange={(e) => setForm({ ...form, priority: e.target.value })}
+                                onChange={e => setForm({ ...form, priority: Number(e.target.value) })}
                             />
                         </Form.Group>
-                        <Form.Group>
-                            <Form.Label>creationDate</Form.Label>
+
+                        <Form.Group className="mb-2">
+                            <Form.Label>Data utworzenia</Form.Label>
                             <Form.Control
                                 type="date"
                                 value={form.creationDate}
-                                onChange={(e) => setForm({ ...form, creationDate: e.target.value })}
+                                onChange={e => setForm({ ...form, creationDate: e.target.value })}
                             />
                         </Form.Group>
+
                         <Form.Group className="mb-2">
-                            <Form.Label>doneDate</Form.Label>
+                            <Form.Label>Data zakończenia</Form.Label>
                             <Form.Control
                                 type="date"
                                 value={form.doneDate}
-                                onChange={(e) => setForm({ ...form, doneDate: e.target.value })}
+                                onChange={e => setForm({ ...form, doneDate: e.target.value })}
                             />
                         </Form.Group>
                     </Form>
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="secondary" onClick={() => setShowModal(false)}>Anuluj</Button>
-                    <Button variant="success" onClick={handleSave}>Zapisz</Button>
+                    <Button variant="success" onClick={handleSaveTask}>Zapisz</Button>
                 </Modal.Footer>
             </Modal>
         </Container>
