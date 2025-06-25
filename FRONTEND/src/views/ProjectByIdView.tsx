@@ -254,7 +254,7 @@ function ProjectByIdView() {
                                             <Button size="sm"
                                                     onClick={() => setTaskToUploadFile(task)}
                                                     className="me-2">
-                                                {task.fileIds.length > 0 ? "Podmień efekt pracy" : "Dodaj efekt pracy"}
+                                                {task.fileIds.length > 0 ? "Dodaj kolejny efekt pracy" : "Dodaj efekt pracy"}
                                             </Button>
                                         )}
                                     </td>

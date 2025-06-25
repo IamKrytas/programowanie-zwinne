@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { getAllTasks, createTask, modifyTask, deleteTask } from '../controllers/taskController';
 import { getAllStudents, getAllTeachers } from '../controllers/listUsersController.ts';
 import { getAllProjects } from '../controllers/projectController.ts';
-import { Table, Button, Modal, Form, Container } from 'react-bootstrap';
+import {Table, Button, Modal, Form, Container, Badge} from 'react-bootstrap';
 import { Task } from '../models/Task';
 import { Student } from '../models/Student.ts';
 import { Teacher } from '../models/Teacher.ts';
@@ -25,7 +25,7 @@ function TaskView() {
         name: '',
         description: '',
         priority: 1,
-        assignedStudentId: "",
+        assignedStudentId: null,
         projectId: '',
         teacherId: '',
         fileIds: [],
@@ -52,7 +52,7 @@ function TaskView() {
             const response = await getAllProjects();
             setProjects(response);
         } catch (error) {
-            toast("Błąd pobierania projektów: " + error);
+            console.error("Błąd pobierania projektów: " + error);
         }
     };
 
@@ -61,7 +61,7 @@ function TaskView() {
             const response = await getAllTasks();
             setTasks(response);
         } catch (error) {
-            toast("Error fetching tasks: " + error);
+            console.error("Error fetching tasks: " + error);
         }
     };
 
@@ -89,7 +89,8 @@ function TaskView() {
             console.log("Task deleted:", id);
             handleGetTasks();
         } catch (error) {
-            toast("Error deleting task: " + error);
+            console.error("Error deleting task: " + error);
+            handleGetTasks();
         }
     };
 
@@ -98,8 +99,8 @@ function TaskView() {
         setForm({
             ...task,
             fileIds: task.fileIds.join(','),
-            creationDate: task.creationDate ? new Date(task.creationDate).toISOString().slice(0, 10) : '',
-            doneDate: task.doneDate ? new Date(task.doneDate).toISOString().slice(0, 10) : '',
+            creationDate: task.creationDate ? task.creationDate : null,
+            doneDate: task.doneDate ? task.doneDate : null
         });
         setShowModal(true);
     };
@@ -119,10 +120,10 @@ function TaskView() {
         const payload: Task = {
             ...form,
             fileIds: form.fileIds.split(',').map((id: string) => id.trim()),
-            assignedStudentId: parseInt(form.assignedStudentId),
+            assignedStudentId: form.assignedStudentId,
             priority: parseInt(form.priority),
-            doneDate: new Date(form.doneDate),
-            creationDate: new Date(form.creationDate)
+            doneDate: form.doneDate ? new Date(form.doneDate) : null,
+            creationDate: form.creationDate ? new Date(form.creationDate) : null
         };
 
         try {
@@ -186,7 +187,13 @@ function TaskView() {
                                     return teacher ? `${teacher.name} ${teacher.surname}` : '—';
                                 })()}
                             </td>
-                            <td>{task.fileIds.join(', ') || '—'}</td>
+                            <td>
+                                {task.fileIds.map(fileId => <a href={`http://localhost:8080/api/v1/task/${task!.id}/file/${fileId}`} key={fileId}>
+                                    <Badge className="me-1">
+                                        {fileId.split("_")[2]}
+                                    </Badge>
+                                </a>)}
+                            </td>
                             <td>{task.priority || '—'}</td>
                             <td>{task.creationDate ? new Date(task.creationDate).toISOString().slice(0, 10)
                                 : '—'}</td>
@@ -271,25 +278,6 @@ function TaskView() {
                                 min={1}
                             />
                         </Form.Group>
-
-                        <Form.Group>
-                            <Form.Label>creationDate</Form.Label>
-                            <Form.Control
-                                type="date"
-                                value={form.creationDate}
-                                onChange={(e) => setForm({ ...form, creationDate: e.target.value })}
-                            />
-                        </Form.Group>
-
-                        <Form.Group className="mb-2">
-                            <Form.Label>doneDate</Form.Label>
-                            <Form.Control
-                                type="date"
-                                value={form.doneDate}
-                                onChange={(e) => setForm({ ...form, doneDate: e.target.value })}
-                            />
-                        </Form.Group>
-
                     </Form>
                 </Modal.Body>
                 <Modal.Footer>
