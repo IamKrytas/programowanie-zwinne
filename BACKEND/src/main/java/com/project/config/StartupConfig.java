@@ -43,6 +43,11 @@ public class StartupConfig {
                 log.info("Test student already exists, skipping creation.");
             }
 
+            Student student2 = new Student();
+            if (studentRepository.findByEmail("student2@test.com").isEmpty()) {
+
+            }
+
             Teacher teacher = new Teacher();
             if (teacherRepository.findByEmail("teacher@test.com").isEmpty()) {
                 teacher.setName("Test");

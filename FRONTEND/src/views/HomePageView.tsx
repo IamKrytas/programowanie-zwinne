@@ -3,6 +3,7 @@ import {useEffect, useState} from "react";
 import {getStats} from "../controllers/statsController.ts";
 import Stats from "../models/Stats.ts";
 import {UserRole} from "../models/auth/UserRole.ts";
+import {Link} from "react-router-dom";
 
 const HomePageView = () => {
     const [stats, setStats] = useState<Stats | null>(null);
@@ -17,7 +18,7 @@ const HomePageView = () => {
     return (
         <div className="bg-warning-subtle min-vh-100 py-5">
             <Container>
-                <h1 className="text-center mb-4">Statystyki</h1>
+                <h1 className="text-center mb-4">Globalne statystyki aplikacji</h1>
                 <Row>
                     {stats === null && "..."}
                     {stats !== null && <p>
@@ -35,9 +36,9 @@ const HomePageView = () => {
                 </Row>
 
                 <div className={"text-center"}>
-                    {userRole !== "ADMIN" && <Button variant="success" href="/projects" className="mt-3 m-1">Projekty</Button>}
-                    {userRole !== "ADMIN" && <Button variant="success" href="/tasks" className="mt-3 m-1">Zadania</Button>}
-                    <Button variant="success" href="/tasks" className="mt-3 m-1">Chat</Button>
+                    {userRole !== "ADMIN" && <Link to={"/projects"}><Button variant="success" className="mt-3 m-1">Projekty</Button></Link>}
+                    {userRole !== "ADMIN" && <Link to={"/tasks"}><Button variant="success" className="mt-3 m-1">Zadania</Button></Link>}
+                    <Link to={"/chat"}><Button variant="success" className="mt-3 m-1">Chat</Button></Link>
                 </div>
             </Container>
         </div>

@@ -3,10 +3,10 @@ export interface Task {
     projectId: string;
     teacherId: string;
     fileIds: string[];
-    assignedStudentId: number;
+    assignedStudentId: string | null;
     name: string;
     description: string;
     priority: number;
-    doneDate: Date;
-    creationDate: Date;
+    doneDate: Date | null;
+    creationDate: Date | null;
 }

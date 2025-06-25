@@ -34,7 +34,7 @@ public class Teacher {
     private String email;
 
     @NotBlank()
-    @Size(min = 18, max = 50, message = "Password should have at least {min}.")
+    @Size(min = 18, max = 500)
     @Field(name = "password")
     private String password;
 }

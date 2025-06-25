@@ -25,7 +25,7 @@ function TaskView() {
         name: '',
         description: '',
         priority: 1,
-        assignedStudentId: 0,
+        assignedStudentId: "",
         projectId: '',
         teacherId: '',
         fileIds: [],
@@ -257,21 +257,6 @@ function TaskView() {
                                 {listStudents.map((student) => (
                                     <option key={student.id} value={student.id}>
                                         {student.name} {student.surname}
-                                    </option>
-                                ))}
-                            </Form.Select>
-                        </Form.Group>
-
-                        <Form.Group className="mb-2">
-                            <Form.Label>Nazwa nauczyciela</Form.Label>
-                            <Form.Select
-                                value={form.teacherId}
-                                onChange={(e) => setForm({ ...form, teacherId: e.target.value })}
-                            >
-                                <option value="">Wybierz Nauczyciela</option>
-                                {listTeachers.map((teacher) => (
-                                    <option key={teacher.id} value={teacher.id}>
-                                        {teacher.name} {teacher.surname}
                                     </option>
                                 ))}
                             </Form.Select>

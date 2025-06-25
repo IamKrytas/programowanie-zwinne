@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { Table, Button, Modal, Form } from 'react-bootstrap';
+import React, { useState, useEffect } from 'react';
+import {Table, Button, Modal, Form, Badge, CloseButton} from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { toast } from "react-toastify";
 
@@ -12,6 +12,7 @@ import { Project } from '../models/Project';
 import { Teacher } from "../models/Teacher.ts";
 import { Student } from "../models/Student.ts";
 import { Task } from "../models/Task.ts";
+import FileUploadModal from "../components/FileUploadModal.tsx";
 
 function ProjectView() {
     const [projects, setProjects] = useState<Project[]>([]);
@@ -24,6 +25,8 @@ function ProjectView() {
 
     const userRole: UserRole = localStorage.getItem("accessRole") as UserRole;
     const navigate = useNavigate();
+
+    const [projectToUploadFile, setProjectToUploadFile] = useState<Project | null>(null);
 
     const emptyProject: Project = {
         id: '',
@@ -94,7 +97,7 @@ function ProjectView() {
             await deleteProject(id);
             handleGetProjects();
         } catch (error) {
-            toast("Błąd usuwania projektu: " + error);
+            handleGetProjects();
         }
     };
 
@@ -154,7 +157,29 @@ function ProjectView() {
         }));
     };
 
-    return (
+    const handleDeleteProjectFile = (event: React.MouseEvent<HTMLButtonElement>, id: string, fileId: string) => {
+        event.stopPropagation();
+        event.preventDefault();
+
+        fetch(`http://localhost:8080/api/v1/project/${id}/file/${fileId}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('accessToken') || ''}`
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Błąd usuwania pliku: ${response.status}`);
+            }
+            toast("Plik został usunięty.");
+            handleGetProjects().then();
+        })
+        .catch(error => {
+            toast("Błąd usuwania pliku: " + error);
+        });
+    }
+
+    return <>
         <div className="container mt-4">
             <h2>Zarządzanie Projektami</h2>
 
@@ -172,7 +197,7 @@ function ProjectView() {
                         <th>Zadania</th>
                         <th>Pliki</th>
                         <th>Data Utworzenia</th>
-                        <th>Data Zakończenia</th>
+                        <th>Data Zakończenia (Deadline)</th>
                         <th>Akcje</th>
                     </tr>
                 </thead>
@@ -202,18 +227,40 @@ function ProjectView() {
                                     {(project.taskIds ?? []).map(id => {
                                         const task = tasks.find(t => t.id === id);
                                         return task ? task.name : '';
-                                    }).join(', ')}
+                                    }).filter(task => task !== '').join(', ')}
                                 </td>
-                                <td>{(project.fileIds ?? []).join(', ')}</td>
+
+                                <td>
+                                    {(project.fileIds ?? []).map(fileId =>
+                                        <a href={`http://localhost:8080/api/v1/project/${project.id}/file/${fileId}`} key={fileId} target={"_blank"}>
+                                            <Badge className={"d-inline-flex align-items-center me-2 m-1"}>
+                                                Załącznik: {fileId.split("_")[2]}
+
+                                                {userRole === "TEACHER" &&
+                                                <CloseButton
+                                                    onClick={(event) => handleDeleteProjectFile(event, project.id, fileId)}
+                                                    className="ms-2"
+                                                    variant="white"
+                                                    aria-label="Usuń"
+                                                />}
+                                            </Badge>
+                                        </a>
+                                    )}
+                                    {project.fileIds && project.fileIds.length === 0 && <span>-</span>}
+                                </td>
+
                                 <td>{new Date(project.creationDate).toISOString().slice(0, 10)}</td>
                                 <td>{new Date(project.doneDate).toISOString().slice(0, 10)}</td>
                                 <td>
                                     {userRole === "TEACHER" && (
-                                        <Button size="sm" onClick={() => handleEdit(project)} className="me-2">Edytuj</Button>
+                                        <Button size="sm" onClick={() => handleEdit(project)} className="me-2 my-1">Edytuj</Button>
                                     )}
-                                    <Button size="sm" variant="warning" onClick={() => navigate(`/project/${project.id}`)} className="me-2">Zobacz</Button>
+                                    <Button size="sm" variant="warning" onClick={() => navigate(`/project/${project.id}`)} className="me-2 my-1">Zobacz</Button>
                                     {userRole === "TEACHER" && (
-                                        <Button size="sm" variant="danger" onClick={() => handleDelete(project.id)}>Usuń</Button>
+                                        <Button size="sm" variant="success" onClick={() => setProjectToUploadFile(project)} className="me-2 my-1">Dodaj plik</Button>
+                                    )}
+                                    {userRole === "TEACHER" && (
+                                        <Button size="sm" variant="danger" onClick={() => handleDelete(project.id)} className="me-2 my-1">Usuń</Button>
                                     )}
                                 </td>
                             </tr>
@@ -221,110 +268,76 @@ function ProjectView() {
                     )}
                 </tbody>
             </Table>
-
-            <Modal show={showModal} onHide={() => setShowModal(false)}>
-                <Modal.Header closeButton>
-                    <Modal.Title>{editingProject ? 'Edytuj Projekt' : 'Nowy Projekt'}</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    <Form>
-                        <Form.Group className="mb-2">
-                            <Form.Label>Nazwa</Form.Label>
-                            <Form.Control
-                                type="text"
-                                value={form.name}
-                                onChange={(e) => handleInputChange('name', e.target.value)}
-                            />
-                        </Form.Group>
-                        <Form.Group className="mb-2">
-                            <Form.Label>Opis</Form.Label>
-                            <Form.Control
-                                type="text"
-                                value={form.description}
-                                onChange={(e) => handleInputChange('description', e.target.value)}
-                            />
-                        </Form.Group>
-                        <Form.Group className="mb-2">
-                            <Form.Label>Wybierz Nauczyciela</Form.Label>
-                            <Form.Select
-                                value={form.teacherId}
-                                onChange={(e) => handleInputChange('teacherId', e.target.value)}
-                            >
-                                <option value="">Wybierz Nauczyciela</option>
-                                {listTeachers.map((teacher) => (
-                                    <option key={teacher.id} value={teacher.id}>
-                                        {teacher.name} {teacher.surname}
-                                    </option>
-                                ))}
-                            </Form.Select>
-                        </Form.Group>
-                        <Form.Group className="mb-2">
-                            <Form.Label>Wybierz Studentów</Form.Label>
-                            <Form.Select
-                                multiple
-                                value={form.studentIds ? form.studentIds.split(',').map(id => id.trim()) : []}
-                                onChange={(e) => {
-                                    const selectedOptions = Array.from(e.target.selectedOptions, option => option.value);
-                                    handleInputChange('studentIds', selectedOptions.join(','));
-                                }}
-                            >
-                                {listStudents.map((student) => (
-                                    <option key={student.id} value={student.id}>
-                                        {student.name} {student.surname}
-                                    </option>
-                                ))}
-                            </Form.Select>
-                        </Form.Group>
-                        <Form.Group className="mb-2">
-                            <Form.Label>Wybierz Zadania</Form.Label>
-                            <Form.Select
-                                multiple
-                                value={form.taskIds ? form.taskIds.split(',').map(id => id.trim()) : []}
-                                onChange={(e) => {
-                                    const selectedOptions = Array.from(e.target.selectedOptions, option => option.value);
-                                    handleInputChange('taskIds', selectedOptions.join(','));
-                                }}
-                            >
-                                {tasks.map((task) => (
-                                    <option key={task.id} value={task.id}>
-                                        {task.name}
-                                    </option>
-                                ))}
-                            </Form.Select>
-                        </Form.Group>
-                        <Form.Group className="mb-2">
-                            <Form.Label>ID Plików (oddzielone przecinkami)</Form.Label>
-                            <Form.Control
-                                type="text"
-                                value={form.fileIds}
-                                onChange={(e) => handleInputChange('fileIds', e.target.value)}
-                            />
-                        </Form.Group>
-                        <Form.Group className="mb-2">
-                            <Form.Label>Data Utworzenia</Form.Label>
-                            <Form.Control
-                                type="date"
-                                value={form.creationDate}
-                                onChange={(e) => handleInputChange('creationDate', e.target.value)}
-                            />
-                        </Form.Group>
-                        <Form.Group className="mb-2">
-                            <Form.Label>Data Zakończenia</Form.Label>
-                            <Form.Control
-                                type="date"
-                                value={form.doneDate}
-                                onChange={(e) => handleInputChange('doneDate', e.target.value)}
-                            />
-                        </Form.Group>
-                    </Form>
-                </Modal.Body>
-                <Modal.Footer>
-                    <Button variant="secondary" onClick={() => setShowModal(false)}>Anuluj</Button>
-                    <Button variant="success" onClick={handleSave}>Zapisz</Button>
-                </Modal.Footer>
-            </Modal>
         </div>
-    );
+
+
+        <Modal show={showModal} onHide={() => setShowModal(false)}>
+            <Modal.Header closeButton>
+                <Modal.Title>{editingProject ? 'Edytuj Projekt' : 'Nowy Projekt'}</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+                <Form onSubmit={event => {event.preventDefault(); handleSave()}}>
+                    <Form.Group className="mb-2">
+                        <Form.Label>Nazwa</Form.Label>
+                        <Form.Control
+                            required
+                            type="text"
+                            value={form.name}
+                            onChange={(e) => handleInputChange('name', e.target.value)}
+                        />
+                    </Form.Group>
+                    <Form.Group className="mb-2">
+                        <Form.Label>Opis</Form.Label>
+                        <Form.Control
+                            type="text"
+                            value={form.description}
+                            onChange={(e) => handleInputChange('description', e.target.value)}
+                        />
+                    </Form.Group>
+                    <Form.Group className="mb-2">
+                        <Form.Label>Wybierz Studentów</Form.Label>
+                        <Form.Select
+                            multiple
+                            value={form.studentIds ? form.studentIds.split(',').map(id => id.trim()) : []}
+                            onChange={(e) => {
+                                const selectedOptions = Array.from(e.target.selectedOptions, option => option.value);
+                                handleInputChange('studentIds', selectedOptions.join(','));
+                            }}
+                        >
+                            {listStudents.map((student) => (
+                                <option key={student.id} value={student.id}>
+                                    {student.name} {student.surname}
+                                </option>
+                            ))}
+                        </Form.Select>
+                    </Form.Group>
+                    <Form.Group className="mb-2">
+                        <Form.Label>Data Zakończenia (Deadline)</Form.Label>
+                        <Form.Control
+                            type="date"
+                            required
+                            value={form.doneDate}
+                            onChange={(e) => handleInputChange('doneDate', e.target.value)}
+                        />
+                    </Form.Group>
+
+                    <Modal.Footer>
+                        <Button variant="secondary" onClick={() => setShowModal(false)}>Anuluj</Button>
+                        <Button variant="success" type={"submit"}>Zapisz</Button>
+                    </Modal.Footer>
+                </Form>
+            </Modal.Body>
+        </Modal>
+
+        {projectToUploadFile && (
+            <FileUploadModal
+                show={!!projectToUploadFile}
+                onHide={() => handleGetProjects().then(() =>setProjectToUploadFile(null))}
+                projectId={projectToUploadFile.id}
+                mode={"project"}
+            />
+        )}
+    </>;
 }
 
 export default ProjectView;
