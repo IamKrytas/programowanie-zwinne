@@ -39,7 +39,7 @@ export const getTaskByIdService = async (id: string): Promise<Task> => {
 export const createTaskService = async (task: Task): Promise<Task> => {
     const token = localStorage.getItem("accessToken");
     const API_URL = "http://localhost:8080";
-    const response = await fetch(`${API_URL}/api/v1/task`, {
+    const response = await fetch(`${API_URL}/api/v1/task/${task.projectId}`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",

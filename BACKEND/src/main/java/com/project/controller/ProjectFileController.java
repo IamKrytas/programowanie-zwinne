@@ -3,22 +3,16 @@ package com.project.controller;
 import com.project.model.Project;
 import com.project.model.Task;
 import com.project.service.ProjectFileService;
-import jakarta.annotation.Resource;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
-import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.InputStreamResource;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 
+@RestController
 @RequestMapping("/api/v1")
 @RequiredArgsConstructor
 public class ProjectFileController {
@@ -30,6 +24,7 @@ public class ProjectFileController {
         InputStreamResource resource = new InputStreamResource(stream);
 
         return ResponseEntity.ok()
+                .contentType(org.springframework.http.MediaType.APPLICATION_OCTET_STREAM)
                 .body(resource);
     }
 
@@ -56,6 +51,7 @@ public class ProjectFileController {
         InputStreamResource resource = new InputStreamResource(stream);
 
         return ResponseEntity.ok()
+                .contentType(org.springframework.http.MediaType.APPLICATION_OCTET_STREAM)
                 .body(resource);
     }
 

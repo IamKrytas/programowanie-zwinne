@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 @Slf4j
 @Service
@@ -53,6 +54,8 @@ public class ProjectManagementService {
             throw new SecurityException("Only teachers can create projects.");
         }
 
+        project.setId(null);
+        project.setTaskIds(Set.of());
         project.setTeacherId(userId);
         project.setCreationDate(LocalDateTime.now());
 

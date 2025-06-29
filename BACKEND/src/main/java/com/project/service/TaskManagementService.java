@@ -44,7 +44,7 @@ public class TaskManagementService {
             return task;
         }
 
-        if ("STUDENT".equalsIgnoreCase(role) && String.valueOf(task.getAssignedStudentId()).equals(userId)) {
+        if ("STUDENT".equalsIgnoreCase(role)) {
             return task;
         }
 
@@ -61,6 +61,10 @@ public class TaskManagementService {
                         return new RuntimeException("Project not found");
                     });
 
+            task.setTeacherId(project.getTeacherId());
+            task.setId(null);
+            task.setCreationDate(java.time.LocalDateTime.now());
+
             if (!String.valueOf(project.getTeacherId()).equals(userId)) {
                 log.warn("User: {} not authorized to create task in project: {}", userId, projectId);
                 throw new SecurityException("Unauthorized to create task for this project");
@@ -68,6 +72,11 @@ public class TaskManagementService {
 
             Task saved = taskRepository.save(task);
             log.info("Task created successfully with ID: {} in project: {}", saved.getId(), projectId);
+
+            project.getTaskIds().add(saved.getId());
+            projectRepository.save(project);
+            log.info("Project with ID: {} updated with new task ID: {}", projectId, saved.getId());
+
             return saved;
         } else {
             log.warn("Unauthorized role '{}' tried to create task", role);
@@ -89,6 +98,7 @@ public class TaskManagementService {
             existingTask.setPriority(updatedTask.getPriority());
             existingTask.setDoneDate(updatedTask.getDoneDate());
             existingTask.setCreationDate(updatedTask.getCreationDate());
+            existingTask.setAssignedStudentId(updatedTask.getAssignedStudentId());
 
             Task saved = taskRepository.save(existingTask);
             log.info("Task with ID: {} updated successfully by user: {}", saved.getId(), userId);
@@ -109,6 +119,9 @@ public class TaskManagementService {
 
         if ("TEACHER".equalsIgnoreCase(role) && task.getTeacherId().equals(userId)) {
             taskRepository.delete(task);
+            Project project = projectRepository.findById(task.getProjectId()).orElseThrow();
+            project.getTaskIds().remove(taskId);
+            projectRepository.save(project);
             log.info("Task with ID: {} deleted successfully by user: {}", taskId, userId);
         } else {
             log.warn("User: {} unauthorized to delete task: {}", userId, taskId);

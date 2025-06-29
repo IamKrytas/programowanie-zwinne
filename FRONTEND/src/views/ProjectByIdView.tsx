@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { Container, Table, Button, Form, Modal } from 'react-bootstrap';
+import {Container, Table, Button, Form, Modal, Badge, CloseButton} from 'react-bootstrap';
 import { toast } from "react-toastify";
 
 import { UserRole } from "../models/auth/UserRole.ts";
@@ -12,6 +12,7 @@ import { Task } from "../models/Task.ts";
 import { getProjectById } from '../controllers/projectController';
 import { getTaskById, modifyTask, createTask, deleteTask } from '../controllers/taskController';
 import { getAllStudents, getAllTeachers } from '../controllers/listUsersController.ts';
+import FileUploadModal from "../components/FileUploadModal.tsx";
 
 function ProjectByIdView() {
     const { id } = useParams<{ id: string }>();
@@ -24,24 +25,23 @@ function ProjectByIdView() {
 
     const userRole: UserRole = localStorage.getItem("accessRole") as UserRole;
 
+    const [taskToUploadFile, setTaskToUploadFile] = useState<Task | null>(null);
+
     const emptyTask: Task = {
         id: '',
         name: '',
         description: '',
-        priority: 0,
-        assignedStudentId: 0,
+        priority: 1,
+        assignedStudentId: null,
         projectId: '',
         teacherId: '',
         fileIds: [],
         creationDate: new Date(),
-        doneDate: new Date()
+        doneDate: null
     };
 
     const [form, setForm] = useState({
         ...emptyTask,
-        fileIds: '',
-        creationDate: '',
-        doneDate: ''
     });
 
     useEffect(() => {
@@ -56,14 +56,25 @@ function ProjectByIdView() {
             const fetchedProject = await getProjectById(projectId);
             setProject(fetchedProject);
 
+            const whoami = await fetch("http://localhost:8080/api/v1/whoami", {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('accessToken')}`
+                }
+            });
+            const whoamiData = await whoami.text();
+
             if (fetchedProject.taskIds?.length > 0) {
-                const fetchedTasks = await Promise.all(fetchedProject.taskIds.map(getTaskById));
+                let fetchedTasks = await Promise.all(fetchedProject.taskIds.map(getTaskById));
+                if (localStorage.getItem("accessRole") === "STUDENT") {
+                    fetchedTasks = fetchedTasks.filter(task => task.assignedStudentId === whoamiData);
+                }
+
                 setTasks(fetchedTasks);
             } else {
                 setTasks([]);
             }
         } catch (error) {
-            toast.error(`Błąd podczas pobierania projektu: ${error}`);
+            console.error(`Błąd podczas pobierania projektu: ${error}`);
         }
     };
 
@@ -72,7 +83,7 @@ function ProjectByIdView() {
             const result = await getAllTeachers();
             setTeachers(result);
         } catch (error) {
-            toast.error(`Błąd pobierania nauczycieli: ${error}`);
+            console.error(`Błąd pobierania nauczycieli: ${error}`);
         }
     };
 
@@ -81,16 +92,16 @@ function ProjectByIdView() {
             const result = await getAllStudents();
             setStudents(result);
         } catch (error) {
-            toast.error(`Błąd pobierania studentów: ${error}`);
+            console.error(`Błąd pobierania studentów: ${error}`);
         }
     };
 
     const handleDeleteTask = async (taskId: string) => {
         try {
             await deleteTask(taskId);
-            if (project?.id) loadProjectAndTasks(project.id);
+            loadProjectAndTasks(id!);
         } catch (error) {
-            toast.error(`Błąd usuwania zadania: ${error}`);
+            loadProjectAndTasks(id!);
         }
     };
 
@@ -98,9 +109,8 @@ function ProjectByIdView() {
         setEditingTask(task);
         setForm({
             ...task,
-            fileIds: task.fileIds.join(','),
-            creationDate: task.creationDate ? new Date(task.creationDate).toISOString().slice(0, 10) : '',
-            doneDate: task.doneDate ? new Date(task.doneDate).toISOString().slice(0, 10) : ''
+            creationDate: task.creationDate ?? new Date(),
+            doneDate: task.doneDate ?? null
         });
         setShowModal(true);
     };
@@ -109,9 +119,6 @@ function ProjectByIdView() {
         setEditingTask(null);
         setForm({
             ...emptyTask,
-            fileIds: '',
-            creationDate: '',
-            doneDate: ''
         });
         setShowModal(true);
     };
@@ -119,12 +126,11 @@ function ProjectByIdView() {
     const handleSaveTask = async () => {
         const payload: Task = {
             ...form,
-            fileIds: form.fileIds.split(',').map(id => id.trim()),
             projectId: project?.id || '',
-            assignedStudentId: Number(form.assignedStudentId),
+            assignedStudentId: form.assignedStudentId,
             priority: Number(form.priority),
-            creationDate: new Date(form.creationDate),
-            doneDate: new Date(form.doneDate)
+            creationDate: form.creationDate ? new Date(form.creationDate) : null,
+            doneDate: form.doneDate ? new Date(form.doneDate) : null
         };
 
         try {
@@ -134,7 +140,7 @@ function ProjectByIdView() {
                 await createTask(payload);
             }
             setShowModal(false);
-            if (project?.id) loadProjectAndTasks(project.id);
+            loadProjectAndTasks(id!);
         } catch (error) {
             toast.error(`Błąd zapisu zadania: ${error}`);
         }
@@ -143,13 +149,53 @@ function ProjectByIdView() {
     const projectTeacher = teachers.find(t => t.id === project?.teacherId);
     const projectStudents = students.filter(s => project?.studentIds.includes(String(s.id)));
 
+    function handleDeleteProjectFile(event: React.MouseEvent<HTMLButtonElement>, id: string, fileId: string) {
+        event.stopPropagation();
+        event.preventDefault();
+
+        fetch(`http://localhost:8080/api/v1/project/${id}/file/${fileId}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+            }
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Błąd usuwania pliku: ${response.status}`);
+                }
+                toast.success("Plik został usunięty pomyślnie!");
+                loadProjectAndTasks(id);
+            })
+            .catch(error => {
+                toast.error(`Błąd podczas usuwania pliku: ${error}`);
+            });
+    }
+
     return (
         <Container className="mt-4">
             <h2>Projekt: {project?.name}</h2>
             <p><strong>Opis:</strong> {project?.description}</p>
             <p><strong>Nauczyciel:</strong> {projectTeacher ? `${projectTeacher.name} ${projectTeacher.surname}` : 'Brak'}</p>
             <p><strong>Studenci:</strong> {projectStudents.map(s => `${s.name} ${s.surname}`).join(', ') || 'Brak'}</p>
-            <p><strong>Pliki:</strong> {project?.fileIds?.join(', ')}</p>
+            <p>
+                <strong>Pliki: </strong><br />
+                {(project?.fileIds ?? []).map(fileId =>
+                    <a href={`http://localhost:8080/api/v1/project/${project!.id}/file/${fileId}`} key={fileId} target={"_blank"}>
+                        <Badge className={"d-inline-flex align-items-center me-2 m-1"}>
+                            Załącznik: {fileId.split("_")[2]}
+
+                            {userRole === "TEACHER" && <CloseButton
+                                onClick={(event) => handleDeleteProjectFile(event, project!.id, fileId)}
+                                className="ms-2"
+                                variant="white"
+                                aria-label="Usuń"
+                            />}
+                        </Badge>
+                    </a>
+                )}
+                {project?.fileIds && project.fileIds.length === 0 && <span>-</span>}
+
+            </p>
             <p><strong>Data utworzenia:</strong> {project?.creationDate && new Date(project.creationDate).toLocaleDateString()}</p>
             <p><strong>Data zakończenia:</strong> {project?.doneDate && new Date(project.doneDate).toLocaleDateString()}</p>
 
@@ -183,16 +229,33 @@ function ProjectByIdView() {
                                     <td>{task.description}</td>
                                     <td>{student ? `${student.name} ${student.surname}` : 'Brak'}</td>
                                     <td>{teacher ? `${teacher.name} ${teacher.surname}` : 'Brak'}</td>
-                                    <td>{task.fileIds.join(', ')}</td>
+                                    <td>
+                                        {task.fileIds.map((fileId) => (
+                                            <a href={`http://localhost:8080/api/v1/task/${task.id}/file/${fileId}`} key={fileId} target="_blank">
+                                                <Badge>
+                                                    Załącznik: {fileId.split("_")[2]}
+                                                </Badge>
+                                            </a>
+                                        ))}
+                                    </td>
+
                                     <td>{task.priority}</td>
-                                    <td>{new Date(task.creationDate).toLocaleDateString()}</td>
-                                    <td>{new Date(task.doneDate).toLocaleDateString()}</td>
+                                    <td>{new Date(task.creationDate ?? '').toLocaleDateString()}</td>
+                                    <td>{task.doneDate ? new Date(task.doneDate).toLocaleDateString() : "-"}</td>
+
                                     <td>
                                         {userRole === "TEACHER" && (
                                             <>
                                                 <Button size="sm" onClick={() => handleEditTask(task)} className="me-2">Edytuj</Button>
                                                 <Button size="sm" variant="danger" onClick={() => handleDeleteTask(task.id)}>Usuń</Button>
                                             </>
+                                        )}
+                                        {userRole === "STUDENT" && (
+                                            <Button size="sm"
+                                                    onClick={() => setTaskToUploadFile(task)}
+                                                    className="me-2">
+                                                {task.fileIds.length > 0 ? "Dodaj kolejny efekt pracy" : "Dodaj efekt pracy"}
+                                            </Button>
                                         )}
                                     </td>
                                 </tr>
@@ -210,12 +273,13 @@ function ProjectByIdView() {
                     <Modal.Title>{editingTask ? 'Edytuj Zadanie' : 'Nowe Zadanie'}</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <Form>
+                    <Form onSubmit={event => {event.preventDefault(); handleSaveTask();}}>
 
                         <Form.Group className="mb-2">
                             <Form.Label>Nazwa</Form.Label>
                             <Form.Control
                                 type="text"
+                                required
                                 value={form.name}
                                 onChange={e => setForm({ ...form, name: e.target.value })}
                             />
@@ -234,9 +298,8 @@ function ProjectByIdView() {
                         <Form.Group className="mb-2">
                             <Form.Label>Student</Form.Label>
                             <Form.Select
-                                value={form.assignedStudentId}
-                                onChange={e => setForm({ ...form, assignedStudentId: Number(e.target.value) })}
-                            >
+                                value={form.assignedStudentId?.toString()}
+                                onChange={e => setForm({ ...form, assignedStudentId: e.target.value })}>
                                 <option value="">Wybierz studenta</option>
                                 {students.map(s => (
                                     <option key={s.id} value={s.id}>
@@ -247,63 +310,33 @@ function ProjectByIdView() {
                         </Form.Group>
 
                         <Form.Group className="mb-2">
-                            <Form.Label>Nauczyciel</Form.Label>
-                            <Form.Select
-                                value={form.teacherId}
-                                onChange={e => setForm({ ...form, teacherId: e.target.value })}
-                            >
-                                <option value="">Wybierz nauczyciela</option>
-                                {teachers.map(t => (
-                                    <option key={t.id} value={t.id}>
-                                        {t.name} {t.surname}
-                                    </option>
-                                ))}
-                            </Form.Select>
-                        </Form.Group>
-
-                        <Form.Group className="mb-2">
-                            <Form.Label>ID Plików</Form.Label>
-                            <Form.Control
-                                type="text"
-                                value={form.fileIds}
-                                onChange={e => setForm({ ...form, fileIds: e.target.value })}
-                                placeholder="np. file1,file2"
-                            />
-                        </Form.Group>
-
-                        <Form.Group className="mb-2">
                             <Form.Label>Priorytet</Form.Label>
                             <Form.Control
                                 type="number"
                                 value={form.priority}
+                                min={1}
+                                required
                                 onChange={e => setForm({ ...form, priority: Number(e.target.value) })}
                             />
                         </Form.Group>
 
-                        <Form.Group className="mb-2">
-                            <Form.Label>Data utworzenia</Form.Label>
-                            <Form.Control
-                                type="date"
-                                value={form.creationDate}
-                                onChange={e => setForm({ ...form, creationDate: e.target.value })}
-                            />
-                        </Form.Group>
-
-                        <Form.Group className="mb-2">
-                            <Form.Label>Data zakończenia</Form.Label>
-                            <Form.Control
-                                type="date"
-                                value={form.doneDate}
-                                onChange={e => setForm({ ...form, doneDate: e.target.value })}
-                            />
-                        </Form.Group>
+                        <Modal.Footer>
+                            <Button variant="secondary" onClick={() => setShowModal(false)}>Anuluj</Button>
+                            <Button variant="success" type={"submit"}>Zapisz</Button>
+                        </Modal.Footer>
                     </Form>
                 </Modal.Body>
-                <Modal.Footer>
-                    <Button variant="secondary" onClick={() => setShowModal(false)}>Anuluj</Button>
-                    <Button variant="success" onClick={handleSaveTask}>Zapisz</Button>
-                </Modal.Footer>
             </Modal>
+
+            {taskToUploadFile && (
+                <FileUploadModal
+                    show={!!taskToUploadFile}
+                    onHide={() => loadProjectAndTasks(id!).then(() =>setTaskToUploadFile(null))}
+                    projectId={id!}
+                    taskId={taskToUploadFile.id}
+                    mode={"task"}
+                />
+            )}
         </Container>
     );
 }

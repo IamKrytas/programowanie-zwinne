@@ -38,7 +38,7 @@ public class Student {
     private boolean stationary;
 
     @NotBlank()
-    @Size(min = 8, max = 50, message = "Password should have at least {min}.")
+    @Size(min = 8, max = 500)
     @Field(name = "password")
     private String password;
 }

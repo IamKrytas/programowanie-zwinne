@@ -160,7 +160,7 @@ function AdminPanelView() {
               <td>{item.name}</td>
               <td>{item.surname}</td>
               <td>{item.email}</td>
-              <td>{item.password}</td>
+              <td>(zaszyfrowane)</td>
               {type === 'student' && (
                 <td>
                   {(item as Student).stationary ? <span>Tak</span> : <span>Nie</span>}
@@ -210,21 +210,23 @@ function AdminPanelView() {
           <Modal.Title>{editing?.id ? 'Edit' : 'Add'} {editing?.mode}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <Form>
+          <Form onSubmit={event => {event.preventDefault(); handleSubmit();}}>
             <Form.Group controlId="formName" className="mb-2">
-              <Form.Label>Name</Form.Label>
+              <Form.Label>Imię</Form.Label>
               <Form.Control
                 type="text"
                 name="name"
+                required
                 value={formData.name || ''}
                 onChange={handleFormChange}
               />
             </Form.Group>
             <Form.Group controlId="formSurname" className="mb-2">
-              <Form.Label>Surname</Form.Label>
+              <Form.Label>Nazwisko</Form.Label>
               <Form.Control
                 type="text"
                 name="surname"
+                required
                 value={formData.surname || ''}
                 onChange={handleFormChange}
               />
@@ -234,15 +236,17 @@ function AdminPanelView() {
               <Form.Control
                 type="email"
                 name="email"
+                required
                 value={formData.email || ''}
                 onChange={handleFormChange}
               />
             </Form.Group>
             <Form.Group controlId="formPassword" className="mb-2">
-              <Form.Label>Password</Form.Label>
+              <Form.Label>Hasło</Form.Label>
               <Form.Control
                 type="password"
                 name="password"
+                minLength={8}
                 value={formData.password || ''}
                 onChange={handleFormChange}
               />
@@ -258,12 +262,12 @@ function AdminPanelView() {
                 />
               </Form.Group>
             )}
+            <Modal.Footer>
+              <Button variant="secondary" onClick={() => setShowModal(false)}>Anuluj</Button>
+              <Button variant="primary" type={"submit"}>Zapisz</Button>
+            </Modal.Footer>
           </Form>
         </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowModal(false)}>Cancel</Button>
-          <Button variant="primary" onClick={handleSubmit}>Save</Button>
-        </Modal.Footer>
       </Modal>
     </Container>
   );
