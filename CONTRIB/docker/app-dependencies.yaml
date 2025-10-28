@@ -1,44 +1,43 @@
 # ======================================================================
-# This is a docker-compose file that allows to run 
-# application dependencies (e.g. database) for development purposes.
+# Docker Compose file for running MySQL and a GUI tool (phpMyAdmin) for development.
 # 
-# To run: (while being in the repo root directory)
+# To run:
 # > docker-compose -f CONTRIB/docker/app-dependencies.yaml up -d
-# 
+#
 # To stop:
 # > docker-compose -f CONTRIB/docker/app-dependencies.yaml down
-# 
-# After running the file, you should be able to access:
-# - mongo-express at http://localhost:8081
-# - mongodb at mongodb://localhost:27017
+#
+# After running, you can access:
+# - phpMyAdmin at http://localhost:8080
+# - MySQL at mysql://root:admin@localhost:3306
 # ======================================================================
 
 version: '3.8'
 
 services:
-  mongo:
-    image: mongo:latest
+  mysql:
+    image: mysql:8.0
     environment:
-      ME_CONFIG_MONGODB_ADMINUSERNAME: admin
-      ME_CONFIG_MONGODB_ADMINPASSWORD: admin
-      MONGO_INITDB_DATABASE: ptracker
+      MYSQL_ROOT_PASSWORD: admin
+      MYSQL_DATABASE: ptracker
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
     volumes:
-      - mongo-dev-data:/data/db
+      - mysql-dev-data:/var/lib/mysql
     ports:
-      - "27017:27017"
+      - "3306:3306"
 
-  mongoexpress:
-    image: mongo-express:latest
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
     environment:
-      ME_CONFIG_MONGODB_SERVER: mongo
-      ME_CONFIG_MONGODB_ADMINUSERNAME: admin
-      ME_CONFIG_MONGODB_ADMINPASSWORD: admin
-      ME_CONFIG_BASICAUTH: "false"
+      PMA_HOST: mysql
+      PMA_USER: root
+      PMA_PASSWORD: admin
     ports:
-      - "8085:8081"
+      - "8085:80"
     depends_on:
-      - mongo
+      - mysql
 
 volumes:
-  mongo-dev-data:
+  mysql-dev-data:
     driver: local

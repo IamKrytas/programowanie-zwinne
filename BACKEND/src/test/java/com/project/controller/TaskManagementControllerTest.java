@@ -40,7 +40,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 
 @Disabled
-@SpringBootTest
+@SpringBootTest(properties = "spring.profiles.active=test")
 @AutoConfigureMockMvc
 public class TaskManagementControllerTest {
 
@@ -64,7 +64,7 @@ public class TaskManagementControllerTest {
     @BeforeEach
     public void setUp() {
         task = new Task();
-        task.setId("1");
+        task.setId(1L);
         task.setName("Test Task");
         task.setDescription("Test Description");
         task.setPriority(5);
@@ -76,11 +76,11 @@ public class TaskManagementControllerTest {
         task.setProjectId("1");
 
         Project project = new Project();
-        project.setId("1");
+        project.setId(1L);
         project.setTeacherId("1");
 
-        when(projectRepository.findById("1")).thenReturn(Optional.of(project));
-        when(taskRepository.findById("1")).thenReturn(Optional.of(task));
+        when(projectRepository.findById(1L)).thenReturn(Optional.of(project));
+        when(taskRepository.findById(1L)).thenReturn(Optional.of(task));
 
         when(jwtTokenService.validateToken(anyString()))
             .thenReturn(new JwtTokenDetails(JwtTokenType.ACCESS, "1@example.com", UserRole.TEACHER, "mock-token"));
@@ -100,7 +100,7 @@ public class TaskManagementControllerTest {
                         .header("X-User-Id", "1")
                         .header("X-User-Role", "TEACHER"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].id").value("1"))
+                .andExpect(jsonPath("$[0].id").value(1))
                 .andExpect(jsonPath("$[0].name").value("Test Task"));
     }
 
@@ -116,7 +116,7 @@ public class TaskManagementControllerTest {
                         .header("X-User-Id", "2")
                         .header("X-User-Role", "STUDENT"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].id").value("1"))
+                .andExpect(jsonPath("$[0].id").value(1))
                 .andExpect(jsonPath("$[0].name").value("Test Task"));
     }
 
@@ -128,7 +128,7 @@ public class TaskManagementControllerTest {
         				.header("X-User-Id", "1")
         				.header("X-User-Role", "TEACHER"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value("1"))
+                .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.name").value("Test Task"));
     }
 
@@ -142,7 +142,7 @@ public class TaskManagementControllerTest {
         				.header("X-User-Id", "2")
                         .header("X-User-Role", "STUDENT"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value("1"))
+                .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.name").value("Test Task"));
     }
 
@@ -153,7 +153,7 @@ public class TaskManagementControllerTest {
         when(taskService.createTask(any(Task.class), eq("1"), eq("1"), eq("TEACHER")))
                 .thenAnswer(invocation -> {
                     Task t = invocation.getArgument(0);
-                    t.setId("1");  // Symulacja zachowania repozytorium
+                    t.setId(1L);  // Symulacja zachowania repozytorium
                     return t;
                 });
 
@@ -193,7 +193,7 @@ public class TaskManagementControllerTest {
         when(taskService.updateTask(eq("1"), any(Task.class), eq("1"), eq("TEACHER")))
                 .thenAnswer(invocation -> {
                     Task t = invocation.getArgument(1);
-                    t.setId("1"); // ważne, by ID było ustawione
+                    t.setId(1L); // ważne, by ID było ustawione
                     return t;
                 });
 

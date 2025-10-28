@@ -27,7 +27,8 @@ public class ProjectFileService {
         log.info("Uploading file with ID {} for project {}", fileId, projectId);
         String fileName = "project_%s_%s".formatted(projectId, fileId);
         fileStorageService.saveFile(fileName, file);
-        Project project = projectRepository.findById(projectId).orElseThrow();
+        Long id = Long.parseLong(projectId);
+        Project project = projectRepository.findById(id).orElseThrow();
         Set<String> fileSet = project.getFileIds();
         fileSet.add(fileName);
         project.setFileIds(fileSet);
@@ -38,7 +39,8 @@ public class ProjectFileService {
 
     public Project deleteProjectFile(String projectId, String fileId){
         fileStorageService.deleteFile(fileId);
-        Project project = projectRepository.findById(projectId).orElseThrow();
+        Long id = Long.parseLong(projectId);
+        Project project = projectRepository.findById(id).orElseThrow();
         Set<String> fileSet = project.getFileIds();
         fileSet.remove(fileId);
         project.setFileIds(fileSet);
@@ -53,7 +55,8 @@ public class ProjectFileService {
     public Task uploadTaskFile(InputStream file, String taskId, String fileId){
         String fileName = "task_%s_%s".formatted(taskId, fileId);
         fileStorageService.saveFile(fileName, file);
-        Task task = taskRepository.findById(taskId).orElseThrow();
+        Long id = Long.parseLong(taskId);
+        Task task = taskRepository.findById(id).orElseThrow();
         Set<String> fileSet = task.getFileIds();
         fileSet.add(fileName);
         task.setFileIds(fileSet);
@@ -64,7 +67,8 @@ public class ProjectFileService {
 
     public Task deleteTaskFile(String taskId, String fileId){
         fileStorageService.deleteFile(fileId);
-        Task task = taskRepository.findById(taskId).orElseThrow();
+        Long id = Long.parseLong(taskId);
+        Task task = taskRepository.findById(id).orElseThrow();
         Set<String> fileSet = task.getFileIds();
         fileSet.remove(fileId);
         task.setFileIds(fileSet);

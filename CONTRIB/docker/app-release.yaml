@@ -1,14 +1,13 @@
 # ======================================================================
-# This is a docker-compose file that allows to 
-# run whole application (including dependencies) for production purposes.
+# Docker Compose file to run the whole application with MySQL for production.
 #
-# To run: (while being in the repo root directory)
+# To run:
 # docker-compose -f CONTRIB/docker/app-release.yaml up -d
 #
-# To stop: (while being in the repo root directory)
+# To stop:
 # docker-compose -f CONTRIB/docker/app-release.yaml down
-# 
-# After running the file, you should be able to access:
+#
+# After running, you should be able to access:
 # - frontend app at http://localhost:8090
 # - backend app at http://localhost:8095
 # ======================================================================
@@ -16,13 +15,17 @@
 version: '3.8'
 
 services:
-  ptracker-release-mongodb:
-    image: mongo:latest
+  ptracker-release-mysql:
+    image: mysql:8.0
     environment:
-      MONGO_INITDB_ROOT_USERNAME: admin
-      MONGO_INITDB_ROOT_PASSWORD: admin
+      MYSQL_ROOT_PASSWORD: admin
+      MYSQL_DATABASE: ptracker
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
     volumes:
-      - mongo-release-data:/data/db
+      - mysql-release-data:/var/lib/mysql
+    ports:
+      - "3306:3306"
 
   ptracker-release-frontend:
     build:
@@ -41,12 +44,12 @@ services:
       - "8095:8095"
     environment:
       - PTRACKER_BACKEND_PORT=8095
-      - PTRACKER_BACKEND_MONGO_HOST=ptracker-release-mongodb
-      - PTRACKER_BACKEND_MONGO_PORT=27017
-      - PTRACKER_BACKEND_MONGO_USERNAME=admin
-      - PTRACKER_BACKEND_MONGO_PASSWORD=admin
-
+      - PTRACKER_BACKEND_DB_HOST=ptracker-release-mysql
+      - PTRACKER_BACKEND_DB_PORT=3306
+      - PTRACKER_BACKEND_DB_USER=user
+      - PTRACKER_BACKEND_DB_PASSWORD=password
+      - PTRACKER_BACKEND_DB_NAME=ptracker
 
 volumes:
-  mongo-release-data:
+  mysql-release-data:
     driver: local

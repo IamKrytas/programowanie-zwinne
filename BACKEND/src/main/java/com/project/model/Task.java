@@ -1,5 +1,6 @@
 package com.project.model;
 
+import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
@@ -8,9 +9,6 @@ import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.time.LocalDateTime;
 import java.util.Set;
@@ -18,45 +16,49 @@ import java.util.Set;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Document(collection = "task")
+@Entity
+@Table(name = "task")
 public class Task {
 
     @Id
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    @Field(name = "projectId")
+    @Column(name = "project_id")
     private String projectId;
 
-    @Field(name = "teacherId")
+    @Column(name = "teacher_id")
     private String teacherId;
 
     @NotEmpty(message = "fileIds cannot be empty")
-    @Field(name = "fileIds")
+    @ElementCollection
+    @CollectionTable(name = "task_file_ids", joinColumns = @JoinColumn(name = "task_id"))
+    @Column(name = "file_id")
     private Set<String> fileIds;
 
     @NotBlank
-    @Field(name = "assignedStudentId")
+    @Column(name = "assigned_student_id", nullable = false)
     private String assignedStudentId;
 
     @NotBlank
     @Size(min = 2, max = 50, message = "Name should have at least {min} and maximum of {max} characters.")
-    @Field(name = "name")
+    @Column(name = "name", nullable = false)
     private String name;
 
     @NotBlank
     @Size(min = 10, max = 200, message = "Description should have at least {min} and maximum of {max} characters.")
-    @Field(name = "description")
+    @Column(name = "description", nullable = false)
     private String description;
 
     @Min(1)
-    @Field(name = "priority")
+    @Column(name = "priority")
     private int priority;
 
     @NotNull
-    @Field(name = "doneDate")
+    @Column(name = "done_date")
     private LocalDateTime doneDate;
 
     @NotNull
-    @Field(name = "creationDate")
+    @Column(name = "creation_date")
     private LocalDateTime creationDate;
 }

@@ -2,12 +2,11 @@ package com.project.repository;
 
 import com.project.model.Task;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
-import java.util.Optional;
 
-public interface TaskRepository extends MongoRepository<Task, String> {
+public interface TaskRepository extends JpaRepository<Task, Long> {
     List<Task> findByAssignedStudentId(String studentId, Pageable pageable);
     List<Task> findByTeacherId(String userId, Pageable pageable);
     List<Task> findByTeacherId(String userId);

@@ -52,7 +52,13 @@ public class AuthServiceTest {
 
     @Test
     public void login_shouldLoginAsTeacherSuccessfully() throws IllegalAccessException {
-        var mockTeacher = new Teacher("id1", "t1", "t1", SAMPLE_EMAIL, SAMPLE_PASSWORD);
+        Teacher mockTeacher = new Teacher();
+        mockTeacher.setId(1L);
+        mockTeacher.setName("t1");
+        mockTeacher.setSurname("t1");
+        mockTeacher.setEmail(SAMPLE_EMAIL);
+        mockTeacher.setPassword(SAMPLE_PASSWORD);
+        
         when(jwtService.generateTokenPair(any(), any())).thenReturn(new JwtTokenPair(SAMPLE_ACCESS_TOKEN, SAMPLE_REFRESH_TOKEN));
         when(teacherRepository.findByEmail(SAMPLE_EMAIL)).thenReturn(Optional.of(mockTeacher));
         when(studentRepository.findByEmail(SAMPLE_EMAIL)).thenReturn(Optional.empty());
@@ -66,7 +72,14 @@ public class AuthServiceTest {
 
     @Test
     public void login_shouldLoginAsStudentSuccessfully() throws IllegalAccessException {
-        var mockStudent = new Student("s1", "s1", "s1", SAMPLE_EMAIL, true, SAMPLE_PASSWORD);
+        Student mockStudent = new Student();
+        mockStudent.setId(1L);
+        mockStudent.setName("s1");
+        mockStudent.setSurname("s1");
+        mockStudent.setEmail(SAMPLE_EMAIL);
+        mockStudent.setStationary(true);
+        mockStudent.setPassword(SAMPLE_PASSWORD);
+        
         when(jwtService.generateTokenPair(any(), any())).thenReturn(new JwtTokenPair(SAMPLE_ACCESS_TOKEN, SAMPLE_REFRESH_TOKEN));
         when(studentRepository.findByEmail(SAMPLE_EMAIL)).thenReturn(Optional.of(mockStudent));
         when(passwordEncoder.matches(SAMPLE_PASSWORD, SAMPLE_PASSWORD)).thenReturn(true);

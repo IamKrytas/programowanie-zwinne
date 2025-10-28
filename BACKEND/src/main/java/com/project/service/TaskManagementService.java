@@ -38,9 +38,10 @@ public class TaskManagementService {
 
     public Task getTaskById(String taskId, String userId, String role) {
         log.info("Fetching task with ID: {} by user: {} with role: {}", taskId, userId, role);
-        Task task = taskRepository.findById(taskId).orElseThrow();
+        Long id = Long.parseLong(taskId);
+        Task task = taskRepository.findById(id).orElseThrow();
 
-        if ("TEACHER".equalsIgnoreCase(role) && String.valueOf(task.getTeacherId()).equals(userId)) {
+        if ("TEACHER".equalsIgnoreCase(role) && task.getTeacherId().equals(userId)) {
             return task;
         }
 
@@ -55,17 +56,19 @@ public class TaskManagementService {
     public Task createTask(Task task, String projectId, String userId, String role) {
         log.info("User: {} attempting to create task in project: {}, role: {}", userId, projectId, role);
         if ("TEACHER".equalsIgnoreCase(role)) {
-            Project project = projectRepository.findById(projectId)
+            Long projectIdLong = Long.parseLong(projectId);
+            Project project = projectRepository.findById(projectIdLong)
                     .orElseThrow(() -> {
                         log.warn("Project with ID: {} not found", projectId);
                         return new RuntimeException("Project not found");
                     });
 
             task.setTeacherId(project.getTeacherId());
+            task.setProjectId(projectId);
             task.setId(null);
             task.setCreationDate(java.time.LocalDateTime.now());
 
-            if (!String.valueOf(project.getTeacherId()).equals(userId)) {
+            if (!project.getTeacherId().equals(userId)) {
                 log.warn("User: {} not authorized to create task in project: {}", userId, projectId);
                 throw new SecurityException("Unauthorized to create task for this project");
             }
@@ -73,7 +76,7 @@ public class TaskManagementService {
             Task saved = taskRepository.save(task);
             log.info("Task created successfully with ID: {} in project: {}", saved.getId(), projectId);
 
-            project.getTaskIds().add(saved.getId());
+            project.getTaskIds().add(String.valueOf(saved.getId()));
             projectRepository.save(project);
             log.info("Project with ID: {} updated with new task ID: {}", projectId, saved.getId());
 
@@ -86,7 +89,8 @@ public class TaskManagementService {
 
     public Task updateTask(String taskId, Task updatedTask, String userId, String role) {
         log.info("Updating task with ID: {} by user: {} with role: {}", taskId, userId, role);
-        Task existingTask = taskRepository.findById(taskId)
+        Long id = Long.parseLong(taskId);
+        Task existingTask = taskRepository.findById(id)
                 .orElseThrow(() -> {
                     log.warn("Task with ID: {} not found", taskId);
                     return new RuntimeException("Task not found");
@@ -111,7 +115,8 @@ public class TaskManagementService {
 
     public void deleteTask(String taskId, String userId, String role) {
         log.info("Attempting to delete task with ID: {} by user: {} with role: {}", taskId, userId, role);
-        Task task = taskRepository.findById(taskId)
+        Long id = Long.parseLong(taskId);
+        Task task = taskRepository.findById(id)
                 .orElseThrow(() -> {
                     log.warn("Task with ID: {} not found", taskId);
                     return new RuntimeException("Task not found");
@@ -119,7 +124,8 @@ public class TaskManagementService {
 
         if ("TEACHER".equalsIgnoreCase(role) && task.getTeacherId().equals(userId)) {
             taskRepository.delete(task);
-            Project project = projectRepository.findById(task.getProjectId()).orElseThrow();
+            Long projectIdLong = Long.parseLong(task.getProjectId());
+            Project project = projectRepository.findById(projectIdLong).orElseThrow();
             project.getTaskIds().remove(taskId);
             projectRepository.save(project);
             log.info("Task with ID: {} deleted successfully by user: {}", taskId, userId);

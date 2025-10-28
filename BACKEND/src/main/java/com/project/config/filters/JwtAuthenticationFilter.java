@@ -53,10 +53,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     String userRole = tokenDetails.getUserRole().name();
 
                     String userId = switch (userRole) {
-                        case "STUDENT" -> studentRepository.findByEmail(userEmail)
-                                .orElseThrow(() -> new RuntimeException("Student not found")).getId();
-                        case "TEACHER" -> teacherRepository.findByEmail(userEmail)
-                                .orElseThrow(() -> new RuntimeException("Teacher not found")).getId();
+                        case "STUDENT" -> String.valueOf(studentRepository.findByEmail(userEmail)
+                                .orElseThrow(() -> new RuntimeException("Student not found")).getId());
+                        case "TEACHER" -> String.valueOf(teacherRepository.findByEmail(userEmail)
+                                .orElseThrow(() -> new RuntimeException("Teacher not found")).getId());
                         default -> userEmail;
                     };
 

@@ -1,44 +1,42 @@
 package com.project.model;
 
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.Field;
-import jakarta.validation.constraints.NotNull;
-
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Document(collection = "student")
+@Entity
+@Table(name = "student")
 public class Student {
     @Id
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @NotBlank()
     @Size(min = 2, max = 50, message = "Name should have at least {min} and maximum of {max} characters.")
-    @Field(name = "name")
+    @Column(name = "name", nullable = false)
     private String name;
 
     @NotBlank()
     @Size(min = 2, max = 50, message = "Surname should have at least {min} and maximum of {max} characters.")
-    @Field(name = "surname")
+    @Column(name = "surname", nullable = false)
     private String surname;
 
     @NotBlank()
     @Size(min = 2, max = 50, message = "E-mail should have at least {min} and maximum of {max} characters.")
-    @Field(name = "email")
+    @Column(name = "email", nullable = false, unique = true)
     private String email;
 
-    @Field(name = "stationary")
+    @Column(name = "stationary")
     private boolean stationary;
 
     @NotBlank()
     @Size(min = 8, max = 500)
-    @Field(name = "password")
+    @Column(name = "password", nullable = false)
     private String password;
 }

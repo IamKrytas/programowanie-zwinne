@@ -32,39 +32,86 @@ public class AdminStudentServiceTest {
 
     @Test
     public void test_getStudentById_shouldReturnStudentWhenExistsInDatabase() throws Exception {
-        Student mockedStudent = new Student("123", "An", "Cz", "a@c.com", true, "pass");
-        when(studentRepository.findById(Mockito.any())).thenReturn(Optional.of(mockedStudent));
+        Student mockedStudent = new Student();
+        mockedStudent.setId(123L);
+        mockedStudent.setName("An");
+        mockedStudent.setSurname("Cz");
+        mockedStudent.setEmail("a@c.com");
+        mockedStudent.setStationary(true);
+        mockedStudent.setPassword("pass");
+        
+        when(studentRepository.findById(123L)).thenReturn(Optional.of(mockedStudent));
         Student studentFromService = adminStudentService.getStudentById("123");
 
         assertThat(studentFromService).isNotNull();
-        assertThat(studentFromService.getId()).isEqualTo("123");
+        assertThat(studentFromService.getId()).isEqualTo(123L);
         assertThat(studentFromService.getName()).isEqualTo("An");
         assertThat(studentFromService.getEmail()).isEqualTo("a@c.com");
         assertThat(studentFromService.getSurname()).isEqualTo("Cz");
         assertThat(studentFromService.isStationary()).isTrue();
 
-        verify(studentRepository, times(1)).findById(Mockito.any());
+        verify(studentRepository, times(1)).findById(123L);
 
     }
     @Test
     public void test_getStudentById_shouldThrowExceptionWhenNotExistsInDatabase() throws Exception {
-        when(studentRepository.findById(Mockito.any())).thenReturn(Optional.empty());
+        when(studentRepository.findById(12334L)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> {
             adminStudentService.getStudentById("12334");
         }).isInstanceOf(NoSuchElementException.class);
 
-        verify(studentRepository, times(1)).findById(Mockito.any());
+        verify(studentRepository, times(1)).findById(12334L);
     }
 
     @Test
     public void test_getStudents_shouldReturnStudentListWhenExistsInDatabase() throws Exception {
         List<Student> mockedStudents = new ArrayList<>();
-        mockedStudents.add(new Student("123", "An", "Cz", "a@c.com", true, "pass"));
-        mockedStudents.add(new Student("133", "Bn", "Dz", "b@d.com", false, "pass1"));
-        mockedStudents.add(new Student("143", "Cn", "Ez", "c@e.com", true, "pass2"));
-        mockedStudents.add(new Student("153", "Dn", "Fz", "d@f.com", false, "pass3"));
-        mockedStudents.add(new Student("163", "En", "Gz", "e@g.com", true, "pass4"));
+        
+        Student student1 = new Student();
+        student1.setId(123L);
+        student1.setName("An");
+        student1.setSurname("Cz");
+        student1.setEmail("a@c.com");
+        student1.setStationary(true);
+        student1.setPassword("pass");
+        mockedStudents.add(student1);
+        
+        Student student2 = new Student();
+        student2.setId(133L);
+        student2.setName("Bn");
+        student2.setSurname("Dz");
+        student2.setEmail("b@d.com");
+        student2.setStationary(false);
+        student2.setPassword("pass1");
+        mockedStudents.add(student2);
+        
+        Student student3 = new Student();
+        student3.setId(143L);
+        student3.setName("Cn");
+        student3.setSurname("Ez");
+        student3.setEmail("c@e.com");
+        student3.setStationary(true);
+        student3.setPassword("pass2");
+        mockedStudents.add(student3);
+        
+        Student student4 = new Student();
+        student4.setId(153L);
+        student4.setName("Dn");
+        student4.setSurname("Fz");
+        student4.setEmail("d@f.com");
+        student4.setStationary(false);
+        student4.setPassword("pass3");
+        mockedStudents.add(student4);
+        
+        Student student5 = new Student();
+        student5.setId(163L);
+        student5.setName("En");
+        student5.setSurname("Gz");
+        student5.setEmail("e@g.com");
+        student5.setStationary(true);
+        student5.setPassword("pass4");
+        mockedStudents.add(student5);
 
         Page<Student> mockedPage = new PageImpl<>(mockedStudents.subList(0, 4));
 
@@ -81,7 +128,7 @@ public class AdminStudentServiceTest {
     @Test
     public void test_createStudent_shouldCreateNewStudentWhenEmailNotExistsInDatabase() throws Exception {
         Student newStudent = new Student();
-        newStudent.setId("1233");
+        newStudent.setId(1233L);
         newStudent.setEmail("a@c.com");
         newStudent.setName("An");
         newStudent.setSurname("Bn");
@@ -104,7 +151,14 @@ public class AdminStudentServiceTest {
     }
     @Test
     public void test_createStudent_shouldThrowExceptionWhenEmailExistsInDatabase() throws Exception {
-        Student mockedStudent = new Student("123", "An", "Cz", "a@c.com", true, "pass");
+        Student mockedStudent = new Student();
+        mockedStudent.setId(123L);
+        mockedStudent.setName("An");
+        mockedStudent.setSurname("Cz");
+        mockedStudent.setEmail("a@c.com");
+        mockedStudent.setStationary(true);
+        mockedStudent.setPassword("pass");
+        
         when(studentRepository.findByEmail("a@c.com")).thenReturn(Optional.of(mockedStudent));
 
         assertThatThrownBy(() -> adminStudentService.createStudent(mockedStudent))
@@ -118,7 +172,7 @@ public class AdminStudentServiceTest {
     public void test_editStudent_shouldEditStudentWhenExistsInDatabase() throws Exception {
         String studentId = "123";
         Student existingStudent = new Student();
-        existingStudent.setId(studentId);
+        existingStudent.setId(123L);
         existingStudent.setEmail("a@c.com");
         existingStudent.setName("An");
         existingStudent.setSurname("Cz");
@@ -131,7 +185,7 @@ public class AdminStudentServiceTest {
         editedStudent.setSurname("NewSurname");
         editedStudent.setPassword("newPassword");
         editedStudent.setStationary(true);
-        when(studentRepository.findById(studentId)).thenReturn(Optional.of(existingStudent));
+        when(studentRepository.findById(123L)).thenReturn(Optional.of(existingStudent));
         when(passwordEncoder.encode("newPassword")).thenReturn("enNewPass");
 
         Student edited = adminStudentService.editStudent(studentId, editedStudent);
@@ -143,7 +197,7 @@ public class AdminStudentServiceTest {
         assertThat(edited.getPassword()).isEqualTo("enNewPass");
         assertThat(edited.isStationary()).isTrue();
 
-        verify(studentRepository).findById(studentId);
+        verify(studentRepository).findById(123L);
         verify(studentRepository).findByEmail("new@a.com");
         verify(passwordEncoder).encode("newPassword");
         verify(studentRepository).save(existingStudent);
@@ -153,16 +207,23 @@ public class AdminStudentServiceTest {
     @Test
     public void test_deleteStudent_shouldDeleteStudentWhenExistsInDatabase() throws Exception {
         String studentId = "123";
-        Student mockedStudent = new Student(studentId, "An", "Cz", "a@c.com", true, "pass");
-        when(studentRepository.findById(studentId)).thenReturn(Optional.of(mockedStudent));
+        Student mockedStudent = new Student();
+        mockedStudent.setId(123L);
+        mockedStudent.setName("An");
+        mockedStudent.setSurname("Cz");
+        mockedStudent.setEmail("a@c.com");
+        mockedStudent.setStationary(true);
+        mockedStudent.setPassword("pass");
+        
+        when(studentRepository.findById(123L)).thenReturn(Optional.of(mockedStudent));
 
         Student deletedStudent = adminStudentService.deleteStudent(studentId);
 
         // then
         assertThat(deletedStudent).isNotNull();
-        assertThat(deletedStudent.getId()).isEqualTo("123");
+        assertThat(deletedStudent.getId()).isEqualTo(123L);
 
-        verify(studentRepository).findById(studentId);
+        verify(studentRepository).findById(123L);
         verify(studentRepository).delete(mockedStudent);
 
     }

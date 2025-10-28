@@ -62,11 +62,11 @@ public class StartupConfig {
             }
 
             Task task = new Task();
-            if (taskRepository.findByTeacherId(teacher.getId()).isEmpty()) {
-                task.setTeacherId(teacher.getId());
+            if (taskRepository.findByTeacherId(String.valueOf(teacher.getId())).isEmpty()) {
+                task.setTeacherId(String.valueOf(teacher.getId()));
                 task.setPriority(5);
                 task.setFileIds(Set.of());
-                task.setAssignedStudentId(student.getId());
+                task.setAssignedStudentId(String.valueOf(student.getId()));
                 task.setDoneDate(LocalDateTime.now());
                 task.setCreationDate(LocalDateTime.now());
                 task.setName("Test task");
@@ -75,17 +75,17 @@ public class StartupConfig {
                 log.info("Test task created: {}", task);
             } else {
                 log.info("Test task already exists, skipping creation.");
-                task = taskRepository.findByTeacherId(teacher.getId()).get(0);
+                task = taskRepository.findByTeacherId(String.valueOf(teacher.getId())).get(0);
             }
 
             Project project = new Project();
-            if (projectRepository.findByTeacherId(teacher.getId()).isEmpty()) {
-                project.setTeacherId(teacher.getId());
-                project.setStudentIds(Set.of(student.getId()));
+            if (projectRepository.findByTeacherId(String.valueOf(teacher.getId())).isEmpty()) {
+                project.setTeacherId(String.valueOf(teacher.getId()));
+                project.setStudentIds(Set.of(String.valueOf(student.getId())));
                 project.setName("Test Project");
                 project.setDescription("This is a test project description.");
                 project.setCreationDate(LocalDateTime.now());
-                project.setTaskIds(Set.of(task.getId()));
+                project.setTaskIds(Set.of(String.valueOf(task.getId())));
                 project = projectRepository.save(project);
                 log.info("Test project created: {}", project);
             } else {

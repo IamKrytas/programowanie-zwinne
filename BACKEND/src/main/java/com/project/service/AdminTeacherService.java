@@ -20,7 +20,8 @@ public class AdminTeacherService {
 
     public Teacher getTeacherById(String teacherId) {
         log.info("Fetching teacher by ID: {}", teacherId);
-        return teacherRepository.findById(teacherId).orElseThrow();
+        Long id = Long.parseLong(teacherId);
+        return teacherRepository.findById(id).orElseThrow();
     }
 
     public List<Teacher> getTeachers(int offset, int limit) {
@@ -44,7 +45,8 @@ public class AdminTeacherService {
 
     public Teacher editTeacher(String teacherId, Teacher data){
         log.info("Editing teacher with ID: {}", teacherId);
-        var teacher = teacherRepository.findById(teacherId).orElseThrow();
+        Long id = Long.parseLong(teacherId);
+        var teacher = teacherRepository.findById(id).orElseThrow();
         teacher.setName(data.getName());
         teacher.setSurname(data.getSurname());
         if (data.getPassword() != null && !data.getPassword().isEmpty()) {
@@ -65,7 +67,8 @@ public class AdminTeacherService {
 
     public Teacher deleteTeacher(String teacherId){
         log.info("Deleting teacher with ID: {}", teacherId);
-        var teacher = teacherRepository.findById(teacherId).orElseThrow();
+        Long id = Long.parseLong(teacherId);
+        var teacher = teacherRepository.findById(id).orElseThrow();
         teacherRepository.delete(teacher);
         log.info("Teacher with ID {} deleted successfully", teacherId);
         return teacher;

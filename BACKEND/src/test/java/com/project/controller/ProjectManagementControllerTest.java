@@ -19,7 +19,7 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@SpringBootTest
+@SpringBootTest(properties = "spring.profiles.active=test")
 @AutoConfigureMockMvc
 public class ProjectManagementControllerTest {
 
@@ -37,7 +37,7 @@ public class ProjectManagementControllerTest {
     @BeforeEach
     public void setup() {
         sampleProject = new Project();
-        sampleProject.setId("p1");
+        sampleProject.setId(1L);
         sampleProject.setName("Test Project");
         sampleProject.setStudentIds(Set.of("1"));
     }
@@ -62,7 +62,7 @@ public class ProjectManagementControllerTest {
                 .requestAttr("id", "1")
                 .requestAttr("role", "TEACHER"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value("p1"));
+                .andExpect(jsonPath("$.id").value(1));
     }
 
     @Test

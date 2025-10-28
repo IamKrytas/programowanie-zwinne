@@ -31,37 +31,78 @@ public class AdminTeacherServiceTest {
 
     @Test
     public void test_getTeacherById_shouldReturnTeacherWhenExistsInDatabase() throws Exception {
-        Teacher mockedTeacher = new Teacher("123", "An", "Cz", "a@c.com", "pass");
-        when(teacherRepository.findById(Mockito.any())).thenReturn(Optional.of(mockedTeacher));
+        Teacher mockedTeacher = new Teacher();
+        mockedTeacher.setId(123L);
+        mockedTeacher.setName("An");
+        mockedTeacher.setSurname("Cz");
+        mockedTeacher.setEmail("a@c.com");
+        mockedTeacher.setPassword("pass");
+        
+        when(teacherRepository.findById(123L)).thenReturn(Optional.of(mockedTeacher));
         Teacher TeacherFromService = adminTeacherService.getTeacherById("123");
 
         assertThat(TeacherFromService).isNotNull();
-        assertThat(TeacherFromService.getId()).isEqualTo("123");
+        assertThat(TeacherFromService.getId()).isEqualTo(123L);
         assertThat(TeacherFromService.getName()).isEqualTo("An");
         assertThat(TeacherFromService.getEmail()).isEqualTo("a@c.com");
         assertThat(TeacherFromService.getSurname()).isEqualTo("Cz");
 
-        verify(teacherRepository, times(1)).findById(Mockito.any());
+        verify(teacherRepository, times(1)).findById(123L);
 
     }
     @Test
     public void test_getTeacherById_shouldThrowExceptionWhenNotExistsInDatabase() throws Exception {
-        when(teacherRepository.findById(Mockito.any())).thenReturn(Optional.empty());
+        when(teacherRepository.findById(12334L)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> {
             adminTeacherService.getTeacherById("12334");
         }).isInstanceOf(NoSuchElementException.class);
 
-        verify(teacherRepository, times(1)).findById(Mockito.any());
+        verify(teacherRepository, times(1)).findById(12334L);
     }
     @Test
     public void test_getTeachers_shouldReturnTeacherListWhenExistsInDatabase() throws Exception {
         List<Teacher> mockedTeachers = new ArrayList<>();
-        mockedTeachers.add(new Teacher("123", "An", "Cz", "a@c.com", "pass"));
-        mockedTeachers.add(new Teacher("133", "Bn", "Dz", "b@d.com", "pass1"));
-        mockedTeachers.add(new Teacher("143", "Cn", "Ez", "c@e.com", "pass2"));
-        mockedTeachers.add(new Teacher("153", "Dn", "Fz", "d@f.com", "pass3"));
-        mockedTeachers.add(new Teacher("163", "En", "Gz", "e@g.com", "pass4"));
+        
+        Teacher teacher1 = new Teacher();
+        teacher1.setId(123L);
+        teacher1.setName("An");
+        teacher1.setSurname("Cz");
+        teacher1.setEmail("a@c.com");
+        teacher1.setPassword("pass");
+        mockedTeachers.add(teacher1);
+        
+        Teacher teacher2 = new Teacher();
+        teacher2.setId(133L);
+        teacher2.setName("Bn");
+        teacher2.setSurname("Dz");
+        teacher2.setEmail("b@d.com");
+        teacher2.setPassword("pass1");
+        mockedTeachers.add(teacher2);
+        
+        Teacher teacher3 = new Teacher();
+        teacher3.setId(143L);
+        teacher3.setName("Cn");
+        teacher3.setSurname("Ez");
+        teacher3.setEmail("c@e.com");
+        teacher3.setPassword("pass2");
+        mockedTeachers.add(teacher3);
+        
+        Teacher teacher4 = new Teacher();
+        teacher4.setId(153L);
+        teacher4.setName("Dn");
+        teacher4.setSurname("Fz");
+        teacher4.setEmail("d@f.com");
+        teacher4.setPassword("pass3");
+        mockedTeachers.add(teacher4);
+        
+        Teacher teacher5 = new Teacher();
+        teacher5.setId(163L);
+        teacher5.setName("En");
+        teacher5.setSurname("Gz");
+        teacher5.setEmail("e@g.com");
+        teacher5.setPassword("pass4");
+        mockedTeachers.add(teacher5);
 
         Page<Teacher> mockedPage = new PageImpl<>(mockedTeachers.subList(0, 4));
 
@@ -78,7 +119,7 @@ public class AdminTeacherServiceTest {
     @Test
     public void test_createTeacher_shouldCreateNewTeacherWhenEmailNotExistsInDatabase() throws Exception {
         Teacher newTeacher = new Teacher();
-        newTeacher.setId("1233");
+        newTeacher.setId(1233L);
         newTeacher.setEmail("a@c.com");
         newTeacher.setName("An");
         newTeacher.setSurname("Bn");
@@ -100,7 +141,13 @@ public class AdminTeacherServiceTest {
     }
     @Test
     public void test_createTeacher_shouldThrowExceptionWhenEmailExistsInDatabase() throws Exception {
-        Teacher mockedTeacher = new Teacher("123", "An", "Cz", "a@c.com", "pass");
+        Teacher mockedTeacher = new Teacher();
+        mockedTeacher.setId(123L);
+        mockedTeacher.setName("An");
+        mockedTeacher.setSurname("Cz");
+        mockedTeacher.setEmail("a@c.com");
+        mockedTeacher.setPassword("pass");
+        
         when(teacherRepository.findByEmail("a@c.com")).thenReturn(Optional.of(mockedTeacher));
 
         assertThatThrownBy(() -> adminTeacherService.createTeacher(mockedTeacher))
@@ -114,7 +161,7 @@ public class AdminTeacherServiceTest {
     public void test_editTeacher_shouldEditTeacherWhenExistsInDatabase() throws Exception {
         String teacherId = "123";
         Teacher existingTeacher = new Teacher();
-        existingTeacher.setId(teacherId);
+        existingTeacher.setId(123L);
         existingTeacher.setEmail("a@c.com");
         existingTeacher.setName("An");
         existingTeacher.setSurname("Cz");
@@ -125,7 +172,7 @@ public class AdminTeacherServiceTest {
         editedTeacher.setName("NewName");
         editedTeacher.setSurname("NewSurname");
         editedTeacher.setPassword("newPassword");
-        when(teacherRepository.findById(teacherId)).thenReturn(Optional.of(existingTeacher));
+        when(teacherRepository.findById(123L)).thenReturn(Optional.of(existingTeacher));
         when(passwordEncoder.encode("newPassword")).thenReturn("enNewPass");
 
         Teacher edited = adminTeacherService.editTeacher(teacherId, editedTeacher);
@@ -136,7 +183,7 @@ public class AdminTeacherServiceTest {
         assertThat(edited.getEmail()).isEqualTo("new@a.com");
         assertThat(edited.getPassword()).isEqualTo("enNewPass");
 
-        verify(teacherRepository).findById(teacherId);
+        verify(teacherRepository).findById(123L);
         verify(teacherRepository).findByEmail("new@a.com");
         verify(passwordEncoder).encode("newPassword");
         verify(teacherRepository).save(existingTeacher);
@@ -146,16 +193,22 @@ public class AdminTeacherServiceTest {
     @Test
     public void test_deleteTeacher_shouldDeleteTeacherWhenExistsInDatabase() throws Exception {
         String TeacherId = "123";
-        Teacher mockedTeacher = new Teacher(TeacherId, "An", "Cz", "a@c.com", "pass");
-        when(teacherRepository.findById(TeacherId)).thenReturn(Optional.of(mockedTeacher));
+        Teacher mockedTeacher = new Teacher();
+        mockedTeacher.setId(123L);
+        mockedTeacher.setName("An");
+        mockedTeacher.setSurname("Cz");
+        mockedTeacher.setEmail("a@c.com");
+        mockedTeacher.setPassword("pass");
+        
+        when(teacherRepository.findById(123L)).thenReturn(Optional.of(mockedTeacher));
 
         Teacher deletedTeacher = adminTeacherService.deleteTeacher(TeacherId);
 
         // then
         assertThat(deletedTeacher).isNotNull();
-        assertThat(deletedTeacher.getId()).isEqualTo("123");
+        assertThat(deletedTeacher.getId()).isEqualTo(123L);
 
-        verify(teacherRepository).findById(TeacherId);
+        verify(teacherRepository).findById(123L);
         verify(teacherRepository).delete(mockedTeacher);
 
     }

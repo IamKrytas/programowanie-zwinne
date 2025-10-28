@@ -35,11 +35,12 @@ public class ProjectManagementService {
 
     public Project getProjectById(String projectId, String userId, String role) {
         log.info("Fetching project with ID: {} for user: {} with role: {}", projectId, userId, role);
+        Long id = Long.parseLong(projectId);
         if ("TEACHER".equalsIgnoreCase(role)) {
-            return projectRepository.findByIdAndTeacherId(projectId, userId)
+            return projectRepository.findByIdAndTeacherId(id, userId)
                     .orElseThrow(() -> new RuntimeException("Project not found or unauthorized"));
         } else if ("STUDENT".equalsIgnoreCase(role)) {
-            return projectRepository.findByIdAndStudentIdsContaining(projectId, userId)
+            return projectRepository.findByIdAndStudentIdsContaining(id, userId)
                     .orElseThrow(() -> new RuntimeException("Project not found or unauthorized"));
         } else {
             log.warn("Unauthorized role '{}' tried to access project", role);
@@ -71,7 +72,8 @@ public class ProjectManagementService {
             throw new SecurityException("Only teachers can update projects.");
         }
 
-        Project existing = projectRepository.findById(projectId)
+        Long id = Long.parseLong(projectId);
+        Project existing = projectRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Project not found"));
 
         if (!existing.getTeacherId().equals(userId)) {
@@ -79,7 +81,7 @@ public class ProjectManagementService {
             throw new SecurityException("You can only update your own projects.");
         }
 
-        updatedProject.setId(projectId);
+        updatedProject.setId(id);
         updatedProject.setTeacherId(userId);
         updatedProject.setCreationDate(existing.getCreationDate());
 
@@ -95,7 +97,8 @@ public class ProjectManagementService {
             throw new SecurityException("Only teachers can delete projects.");
         }
 
-        Project project = projectRepository.findById(projectId)
+        Long id = Long.parseLong(projectId);
+        Project project = projectRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Project not found"));
 
         if (!project.getTeacherId().equals(userId)) {
@@ -103,7 +106,7 @@ public class ProjectManagementService {
             throw new SecurityException("You can only delete your own projects.");
         }
 
-        projectRepository.deleteById(projectId);
+        projectRepository.deleteById(id);
         log.info("Project with ID: {} deleted successfully by user: {}", projectId, userId);
     }
 }

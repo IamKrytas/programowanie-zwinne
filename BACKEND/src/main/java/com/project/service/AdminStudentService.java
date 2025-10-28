@@ -19,7 +19,8 @@ public class AdminStudentService {
 
     public Student getStudentById(String studentId) {
         log.info("Fetching student by ID: {}", studentId);
-        return studentRepository.findById(studentId).orElseThrow();
+        Long id = Long.parseLong(studentId);
+        return studentRepository.findById(id).orElseThrow();
     }
 
     public List<Student> getStudents(int offset, int limit) {
@@ -43,7 +44,8 @@ public class AdminStudentService {
 
     public Student editStudent(String studentId, Student data){
         log.info("Editing student with ID: {}", studentId);
-        var student = studentRepository.findById(studentId).orElseThrow();
+        Long id = Long.parseLong(studentId);
+        var student = studentRepository.findById(id).orElseThrow();
         student.setName(data.getName());
         student.setSurname(data.getSurname());
         if (data.getPassword() != null && !data.getPassword().isEmpty()) {
@@ -65,7 +67,8 @@ public class AdminStudentService {
 
     public Student deleteStudent(String studentId){
         log.info("Deleting student with ID: {}", studentId);
-        var student = studentRepository.findById(studentId).orElseThrow();
+        Long id = Long.parseLong(studentId);
+        var student = studentRepository.findById(id).orElseThrow();
         studentRepository.delete(student);
         log.info("Student with ID {} deleted successfully", studentId);
         return student;
